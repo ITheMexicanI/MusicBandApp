@@ -1,0 +1,4 @@
+name,cor_x,cor_y,num_of_participants,date,genre,album_name,album_tracks
+1,aboba,12,13,1212,2003-12-20,Hip hop,aboba,10
+2,vova,1,1,11,1111-11-12,Rap,asd,1
+3,1,1,1,11,2033-04-12,Rap,aa,12

@@ -1,0 +1,11 @@
+show
+clear
+add
+abobus
+1
+1
+5
+2003-03-03
+Rap
+the-best-album
+3
