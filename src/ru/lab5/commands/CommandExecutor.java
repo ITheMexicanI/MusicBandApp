@@ -1,10 +1,10 @@
-package commands;
+package ru.lab5.commands;
 
-import commands.inputSystem.CommandInput;
-import commands.inputSystem.FileCommandInput;
-import mainObjects.*;
-import parser.CSVWriter;
-import parser.excetions.FileException;
+import ru.lab5.commands.inputSystem.CommandInput;
+import ru.lab5.commands.inputSystem.FileCommandInput;
+import ru.lab5.mainObjects.*;
+import ru.lab5.parser.CSVWriter;
+import ru.lab5.parser.excetions.FileException;
 
 import java.io.*;
 import java.time.LocalDate;

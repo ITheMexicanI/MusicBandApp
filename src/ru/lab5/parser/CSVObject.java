@@ -1,7 +1,6 @@
-package parser;
+package ru.lab5.parser;
 
-import parser.excetions.FileException;
-import parser.excetions.InvalidFieldValue;
+import ru.lab5.parser.excetions.InvalidFieldValue;
 
 import java.util.HashMap;
 import java.util.List;

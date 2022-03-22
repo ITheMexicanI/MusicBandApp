@@ -1,8 +1,8 @@
-package parser;
+package ru.lab5.parser;
 
-import mainObjects.MusicBandCollection;
-import parser.excetions.FileException;
-import parser.excetions.InvalidHeaderException;
+import ru.lab5.mainObjects.MusicBandCollection;
+import ru.lab5.parser.excetions.FileException;
+import ru.lab5.parser.excetions.InvalidHeaderException;
 
 import java.io.*;
 import java.util.ArrayList;

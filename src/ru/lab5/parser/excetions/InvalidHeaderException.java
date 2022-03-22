@@ -1,4 +1,4 @@
-package parser.excetions;
+package ru.lab5.parser.excetions;
 
 /**
  * ВОЗНИКАЕТ ПРИ НЕПРАВИЛЬНО ЗАПОЛНЕНОМ ХЕАДЕРЕ В CSV ФАЙЛЕ

@@ -1,4 +1,4 @@
-package mainObjects;
+package ru.lab5.mainObjects;
 
 import java.util.Arrays;
 import java.util.List;

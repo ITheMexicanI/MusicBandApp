@@ -1,4 +1,4 @@
-package commands.inputSystem;
+package ru.lab5.commands.inputSystem;
 
 import java.io.BufferedReader;
 import java.io.IOException;

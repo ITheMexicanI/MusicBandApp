@@ -1,4 +1,4 @@
-package commands.exceptions;
+package ru.lab5.commands.exceptions;
 
 /**
  * ВОЗНИКАЕТ ПРИ НЕПРАВИЛЬНЫХ КОМАНДАХ ПОЛЬЗОВАТЕЛЯ

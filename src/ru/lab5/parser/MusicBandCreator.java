@@ -1,7 +1,7 @@
-package parser;
+package ru.lab5.parser;
 
-import mainObjects.*;
-import parser.excetions.InvalidFieldValue;
+import ru.lab5.mainObjects.*;
+import ru.lab5.parser.excetions.InvalidFieldValue;
 
 import java.time.LocalDate;
 import java.util.Date;

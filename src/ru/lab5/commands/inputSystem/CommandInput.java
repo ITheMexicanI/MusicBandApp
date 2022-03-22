@@ -1,4 +1,4 @@
-package commands.inputSystem;
+package ru.lab5.commands.inputSystem;
 
 /**
  * ПРОСТО ГОВОРИТ ЧТО ПАРНИ, РЕАЛИЗОВЫВАЮЩИЕ ЭТОТ ИНТЕРФЕЙС ДОЛЖНЫ УМЕТЬ ЧИТАТЬ

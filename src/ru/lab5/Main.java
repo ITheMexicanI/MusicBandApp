@@ -1,9 +1,11 @@
-import commands.CommandExecutor;
-import commands.CommandReader;
-import commands.inputSystem.CommandInput;
-import commands.inputSystem.ConsoleCommandInput;
-import mainObjects.MusicBandCollection;
-import parser.CSVReader;
+package ru.lab5;
+
+import ru.lab5.commands.CommandExecutor;
+import ru.lab5.commands.CommandReader;
+import ru.lab5.commands.inputSystem.CommandInput;
+import ru.lab5.commands.inputSystem.ConsoleCommandInput;
+import ru.lab5.mainObjects.MusicBandCollection;
+import ru.lab5.parser.CSVReader;
 
 public class Main {
     public static void main(String[] args) {
@@ -19,5 +21,5 @@ public class Main {
     }
 }
 
-// execute C:\Users\TheMexican\IdeaProjects\Lab\src\commands.txt
+// execute C:\Users\TheMexican\IdeaProjects\Lab\src\ru.lab5.commands.txt
 // save C:\Users\TheMexican\IdeaProjects\Lab\src\comma.txt

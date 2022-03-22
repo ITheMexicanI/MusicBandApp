@@ -1,9 +1,8 @@
-package commands;
+package ru.lab5.commands;
 
-import commands.exceptions.InvalidExecuteCommand;
-import commands.inputSystem.CommandInput;
+import ru.lab5.commands.exceptions.InvalidExecuteCommand;
+import ru.lab5.commands.inputSystem.CommandInput;
 
-import java.io.*;
 import java.util.*;
 
 /**

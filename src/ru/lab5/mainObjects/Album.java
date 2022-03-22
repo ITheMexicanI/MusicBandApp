@@ -1,4 +1,4 @@
-package mainObjects;
+package ru.lab5.mainObjects;
 
 /**
  * КЛАСС, ХРАНЯЩИЙ В СЕБЕ ИНФОРМАЦИЮ ОБ АЛЬБОМЕ МКУЗЫЧКИ

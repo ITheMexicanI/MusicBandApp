@@ -1,8 +1,8 @@
-package parser;
+package ru.lab5.parser;
 
-import mainObjects.MusicBand;
-import mainObjects.MusicBandCollection;
-import parser.excetions.FileException;
+import ru.lab5.mainObjects.MusicBand;
+import ru.lab5.mainObjects.MusicBandCollection;
+import ru.lab5.parser.excetions.FileException;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -1,4 +1,4 @@
-package commands;
+package ru.lab5.commands;
 
 /**
  * ВСЕВОЗМОЖНЫЕ КОМАНЫ

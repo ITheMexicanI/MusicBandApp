@@ -1,4 +1,4 @@
-package parser.excetions;
+package ru.lab5.parser.excetions;
 
 /**
  * Возникает если к файлу нет доступа или файл не найден
