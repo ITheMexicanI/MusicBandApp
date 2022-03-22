@@ -11,7 +11,7 @@ public class CSVObject {
     private Map<String, String> fields = new HashMap<>();
 
     /**
-     * @param headers ЗАГАЛОВКИ CSV ФАЙЛА
+     * @param headers   ЗАГАЛОВКИ CSV ФАЙЛА
      * @param arguments ПОЛЯ CSV ФАЙЛА
      */
     protected CSVObject(List<String> headers, List<String> arguments) {

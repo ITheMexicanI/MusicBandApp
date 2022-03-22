@@ -11,7 +11,7 @@ public class Main {
 
         // read file and serialize objects
         CSVReader fileReader = new CSVReader(collection);
-        fileReader.readCSVFile("C:\\Users\\TheMexican\\IdeaProjects\\Lab\\src\\csv-example.csv");
+        fileReader.readCSVFile(args[0]);
 
         CommandInput commandInput = new ConsoleCommandInput();
         CommandReader commandReader = new CommandReader(new CommandExecutor(collection, commandInput));

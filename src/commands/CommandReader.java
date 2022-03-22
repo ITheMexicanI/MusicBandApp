@@ -23,9 +23,10 @@ public class CommandReader {
 
     /**
      * ЧИТАЕТ КОМАНДЫ
+     *
      * @param reader ЧИТАТЕЛЬ, ЧИТАЕТ КОМАНДЫ ЛИБО С КОНСОЛИ, ЛИБО С ФАЙЛА
      */
-    public void read(CommandInput reader)  {
+    public void read(CommandInput reader) {
         while (true) {
             try {
                 String line = reader.readLine();
@@ -35,14 +36,15 @@ public class CommandReader {
                 String commandArgs = commandEntry.getValue();
                 executeCommand(command, commandArgs);
             } catch (InvalidExecuteCommand e) {
-                System.out.println("Команда неверна");
+                System.out.println("Команда неверна или нет доступа к файлу");
             }
         }
     }
 
     /**
      * СМОТРИТ НА КОМАНДУ И ДУМАЕТ ВЫПОЛНЯЕТ ЕЕ
-     * @param command КОМАНДА
+     *
+     * @param command     КОМАНДА
      * @param commandArgs АРГУМЕНТ КОМАНДЫ
      */
     private void executeCommand(Command command, String commandArgs) {
@@ -106,13 +108,16 @@ public class CommandReader {
      * @return ВОЗВРАЩАЕТ КОМАНДУ РАЗДЕЛЕННУЮ НА КОМАНДУ И АРГУМЕНТ
      */
     private AbstractMap.SimpleEntry<Command, String> parseCommand(String stringCommand) {
-        String commandArgs;
-        List<String> commandArr = Arrays.asList(stringCommand.split(" "));
-        Command command = Command.getCommandByName(commandArr.get(0));
-        if (commandArr.size() > 1) commandArgs = commandArr.get(1);
-        else commandArgs = "";
+        if (stringCommand.equals(" ")) throw new InvalidExecuteCommand();
+        else {
+            String commandArgs;
+            List<String> commandArr = Arrays.asList(stringCommand.split(" "));
+            Command command = Command.getCommandByName(commandArr.get(0));
+            if (commandArr.size() > 1) commandArgs = commandArr.get(1);
+            else commandArgs = "";
 
-        if (command != null) return new AbstractMap.SimpleEntry<>(command, commandArgs);
-        throw new InvalidExecuteCommand();
+            if (command != null) return new AbstractMap.SimpleEntry<>(command, commandArgs);
+            throw new InvalidExecuteCommand();
+        }
     }
 }
