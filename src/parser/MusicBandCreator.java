@@ -24,6 +24,7 @@ public class MusicBandCreator {
 
     /**
      * ПРАБГАЕТ ПО CSV АБЪЕКТАМ И СТРОИТ ПО НИМ МУЗЫЧКУ
+     *
      * @param csvObjects ХРАНИТ СЫРЫЕ CSV АБЪЕКТЫ
      */
     protected void createMusicBandStack(List<CSVObject> csvObjects) {
@@ -74,11 +75,15 @@ public class MusicBandCreator {
             genre = MusicGenre.getGenreByName(fields.get("genre"));
             checkGenre(genre);
 
-            albumName = fields.get("album_name");
-            albumTracks = Integer.parseInt(fields.get("album_tracks"));
-            checkNonNullString(albumName);
-            checkMoreThanZero((long) albumTracks);
-            album = new Album(albumName, albumTracks);
+            try {
+                albumName = fields.get("album_name");
+                albumTracks = Integer.parseInt(fields.get("album_tracks"));
+                checkNonNullString(albumName);
+                checkMoreThanZero((long) albumTracks);
+                album = new Album(albumName, albumTracks);
+            } catch (NumberFormatException e) {
+                throw new InvalidFieldValue("Number of album tracks must be number: " + fields.get("album_tracks"));
+            }
 
             collection.addMusicBand(new MusicBand(id, name, coordinates, creationDate, numberOfParticipants, establishmentDate, genre, album));
         }
@@ -86,6 +91,7 @@ public class MusicBandCreator {
 
     /**
      * ПРОВЕРЯЕТ ЧТО ПЕРЕДАНА НЕ ПУСТАЯ СТРОКА ТК ЭТО null ПО УСЛОВИЮ
+     *
      * @param string ПРОСТО СТРОКА
      */
     private void checkNonNullString(String string) {
@@ -95,7 +101,8 @@ public class MusicBandCreator {
 
     /**
      * ПРОВЕРЯЕТ ЧТО ПЕРЕДАННОЕ ЧЕСЛО БОЛЬШЕ НОЛЯ
-     * @param num  ПРОСТО ЧЕСЛО
+     *
+     * @param num ПРОСТО ЧЕСЛО
      */
     private void checkMoreThanZero(long num) {
         if (num < 0) throw new InvalidFieldValue("Some field less than zero");
@@ -103,6 +110,7 @@ public class MusicBandCreator {
 
     /**
      * ПРОВЕРЯЕТ ЧТО ПЕРЕДАННЫЙ ЖАНР СУЩЕСТВУЕТ
+     *
      * @param genre ЕНАМ ЖАНРОВ
      */
     private void checkGenre(MusicGenre genre) {

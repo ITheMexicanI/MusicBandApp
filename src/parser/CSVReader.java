@@ -1,6 +1,7 @@
 package parser;
 
 import mainObjects.MusicBandCollection;
+import parser.excetions.FileException;
 import parser.excetions.InvalidHeaderException;
 
 import java.io.*;
@@ -29,6 +30,10 @@ public class CSVReader {
      */
     public void readCSVFile(String fileName) {
         File file = new File(fileName);
+
+        if (!file.exists() || !file.canRead()) {
+            throw new FileException();
+        }
 
         FileInputStream fis = null;
         BufferedInputStream bis = null;
@@ -84,7 +89,7 @@ public class CSVReader {
      */
     private void readArguments() throws IOException {
         while (dis.available() != 0) {
-            List<String> arguments = Arrays.asList(dis.readLine().split(","));
+            List<String> arguments = Arrays.asList(dis.readLine().split(",", -1));
             CSVObject object = createCSVObject(arguments);
             objects.add(object);
         }

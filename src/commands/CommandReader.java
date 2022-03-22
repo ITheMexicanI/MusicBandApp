@@ -36,7 +36,7 @@ public class CommandReader {
                 String commandArgs = commandEntry.getValue();
                 executeCommand(command, commandArgs);
             } catch (InvalidExecuteCommand e) {
-                System.out.println("Команда неверна или нет доступа к файлу");
+                System.out.println("Команда неверна");
             }
         }
     }

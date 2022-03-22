@@ -2,6 +2,7 @@ package parser;
 
 import mainObjects.MusicBand;
 import mainObjects.MusicBandCollection;
+import parser.excetions.FileException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,12 +27,21 @@ public class CSVWriter {
      * МЕТОД, КОТОРЫЙ СОЗДАЕТ ФАЙЛ ДЛЯ МУЗЫЧКИ
      * @param fileName ИМЕЧКО ФАЙЛА
      * @throws IOException МОЖЕТ ВЫВАЛИЦА ПРИ ОШИБКАХ ВВОДА
+     * @throws FileException МОЖЕТ ВЫВАЛИЦА ПРИ ОШИБАХ ПРИ ЧТЕНИИ ФАЙЛА
      */
     public void writeCSVFile(String fileName) throws IOException {
         File file = new File(fileName);
-        file.getParentFile().mkdirs();
-        file.createNewFile();
-        write(fileName);
+
+        if (!file.exists() && file.getParentFile().canExecute()) {
+            file.createNewFile();
+            write(fileName);
+        } else if (!file.getParentFile().canExecute()) {
+            throw new FileException();
+        } else if (file.exists() && file.canWrite()){
+            write(fileName);
+        } else {
+            throw new FileException();
+        }
     }
 
     /**

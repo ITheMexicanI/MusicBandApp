@@ -4,6 +4,7 @@ import commands.inputSystem.CommandInput;
 import commands.inputSystem.FileCommandInput;
 import mainObjects.*;
 import parser.CSVWriter;
+import parser.excetions.FileException;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -140,12 +141,13 @@ public class CommandExecutor {
      */
     protected void executeScript(String commandArgs) {
         File file = new File(commandArgs);
-        if (file.exists()) {
+
+        if (file.exists() && file.canRead()) {
             CommandInput reader = new FileCommandInput(new File(commandArgs));
             CommandReader commandReader = new CommandReader(new CommandExecutor(collection, reader));
             commandReader.read(reader);
         } else {
-            System.out.println("Файл не существует");
+            throw new FileException();
         }
     }
 
@@ -308,8 +310,8 @@ public class CommandExecutor {
     /**
      * СОЗДАЕТ НОВУЮ МУЗЫЧКУ
      * @param id АЙДИ МУЗЫЧКИ
-     * @param creationDate - ДАТА ИНИЦИАЛИЗАЦИИ МУЗЫЧКИ
-     * @return- ВОЗВРАЩАЕТ НОВУЮ МУЗЫЧКУ
+     * @param creationDate ДАТА ИНИЦИАЛИЗАЦИИ МУЗЫЧКИ
+     * @return ВОЗВРАЩАЕТ НОВУЮ МУЗЫЧКУ
      */
     private MusicBand createMusicBand(long id, Date creationDate) {
         // name of album
