@@ -14,13 +14,13 @@ public class FileCommandInput implements CommandInput {
      * ИНИЦИАЛИЗИРУЕТ ВСЕ, ЧТОБЫ ПРОЧИТАТЬ ИЗ ФАЙЛА
      * @param file - ПУТЬ ДО ФАЙЛА
      */
-    public FileCommandInput(File file) {
+    public FileCommandInput(File file) throws FileNotFoundException {
         try {
             fis = new FileInputStream(file);
             bis = new BufferedInputStream(fis);
             dis = new DataInputStream(bis);
-        } catch (FileNotFoundException | NullPointerException e) {
-            System.out.println("Файл не найден");
+        } catch (Exception e) {
+            throw new FileNotFoundException();
         }
     }
 
@@ -32,7 +32,7 @@ public class FileCommandInput implements CommandInput {
     public String readLine() {
         try {
             if (dis.available() != 0) return dis.readLine();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

@@ -1,5 +1,7 @@
 package ru.lab5.mainObjects;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -123,10 +125,11 @@ public class MusicBand implements Comparable<MusicBand> {
      */
     @Override
     public String toString() {
+        DateFormat date = new SimpleDateFormat("dd-MM-yyyy");
         return  "id: " + id +
                 ", имя: " + name +
                 ", координаты: " + coordinates +
-                ", дата добавления: " + creationDate.toString() +
+                ", дата добавления: " + new SimpleDateFormat("dd-MM-yyyy").format(creationDate) +
                 ", участники: " + numberOfParticipants +
                 ", дата создания группы: " + establishmentDate.toString() +
                 ", жанр: " + genre.toString() +
@@ -140,7 +143,8 @@ public class MusicBand implements Comparable<MusicBand> {
         return  id + "," +
                 name + "," +
                 coordinates.getX() + "," +
-                coordinates.getY() + "," + coordinates.getX() +
+                coordinates.getY() + "," +
+                new SimpleDateFormat("dd-MM-yyyy").format(creationDate) + "," +
                 numberOfParticipants + "," +
                 establishmentDate.toString() + "," +
                 genre.toString() + "," +

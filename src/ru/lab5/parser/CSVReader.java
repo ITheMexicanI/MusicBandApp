@@ -14,7 +14,7 @@ import java.util.Objects;
  * ЗАНИМАЕТСЯ ЧТЕНИЕМ CSV ФАЙЛА
  */
 public class CSVReader {
-    private static final List<String> primeHeaders = Arrays.asList("name,cor_x,cor_y,num_of_participants,date,genre,album_name,album_tracks".split(","));
+    private static final List<String> primeHeaders = Arrays.asList("id,name,cor_x,cor_y,creation_date,num_of_participants,date,genre,album_name,album_tracks".split(","));
     private DataInputStream dis;
     private List<String> headers;
     private List<CSVObject> objects = new ArrayList<>();

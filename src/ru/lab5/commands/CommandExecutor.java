@@ -24,7 +24,7 @@ public class CommandExecutor {
 
     /**
      * @param collection - МУЗЫЧКА
-     * @param reader - ЧИТАТЕЛЬ ЛИБО КОНСОЛЬНЫЙ, ЛИБО ФАЙЛОВЫЙ
+     * @param reader     - ЧИТАТЕЛЬ ЛИБО КОНСОЛЬНЫЙ, ЛИБО ФАЙЛОВЫЙ
      */
     public CommandExecutor(MusicBandCollection collection, CommandInput reader) {
         this.collection = collection;
@@ -75,43 +75,56 @@ public class CommandExecutor {
      */
     protected void add() {
         long id = collection.getMusicsCount() + 1;
+        while (collection.getIds().contains(id)) id++;
+
         System.out.println("Добавление нового элемента в коллекцию:");
         collection.addMusicBand(createMusicBand(id, new Date()));
-        System.out.println("Элемент добавлен в колекцию");
+        System.out.println("Элемент добавлен в коллекцию");
     }
 
     /**
      * МЕНЯЕТ ДАННЫЙ ЭЛЕМЕНТ
+     *
      * @param commandArgs - АЙДИ ЭЛЕМЕНТА
      */
     protected void updateId(String commandArgs) {
-        long id = Long.parseLong(commandArgs);
-        MusicBand element = collection.getElementByID(id);
-        if (element != null) {
-            System.out.println("Элемент, который будем менять:");
-            System.out.println(element);
-            System.out.println("Изменение элемента коллекции:");
-            element.updateElement(createMusicBand(id, element.getCreationDate()));
-        } else {
-            System.out.println("Элемента с таким id нет.");
-            System.out.println("Возврат в главное меню...");
+        try {
+            long id = Long.parseLong(commandArgs);
+            MusicBand element = collection.getElementByID(id);
+            if (element != null) {
+                System.out.println("Элемент, который будем менять:");
+                System.out.println(element);
+                System.out.println("Изменение элемента коллекции:");
+                element.updateElement(createMusicBand(id, element.getCreationDate()));
+            } else {
+                System.out.println("Элемента с таким id нет.");
+                System.out.println("Возврат в главное меню...");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Аргумент должен быть числом");
         }
     }
 
     /**
      * УДАЛЯЕТ ЭЛЕМЕНТ ПО ДАННОМУ АЙДИ
+     *
      * @param commandArgs АЙДИ ЭЛЕМЕНТА
      */
     protected void removeId(String commandArgs) {
-        long id = Long.parseLong(commandArgs);
-        MusicBand element = collection.getElementByID(id);
-        if (element != null) {
-            System.out.println("Данный элемент был удален:");
-            System.out.println(element);
-            collection.removeById(id);
-        } else {
-            System.out.println("Элемента с таким id нет.");
-            System.out.println("Возврат в главное меню...");
+        try {
+
+            long id = Long.parseLong(commandArgs);
+            MusicBand element = collection.getElementByID(id);
+            if (element != null) {
+                System.out.println("Данный элемент был удален:");
+                System.out.println(element);
+                collection.removeById(id);
+            } else {
+                System.out.println("Элемента с таким id нет.");
+                System.out.println("Возврат в главное меню...");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Аргумент должен быть числом");
         }
     }
 
@@ -124,31 +137,52 @@ public class CommandExecutor {
 
     /**
      * СОХРАНЯЕТ КОЛЛЕКЦИЮ В CSV ФАЙЛ
+     *
      * @param commandArgs - ПУТЬ ДО ФАЙЛА
      */
     protected void save(String commandArgs) {
         try {
-            CSVWriter writer = new CSVWriter(collection);
-            writer.writeCSVFile(commandArgs);
+            if (commandArgs.isEmpty()) {
+                System.out.println("Путь должен быть корректным, попробуйте снова");
+                commandArgs = inputNonNullString();
+            }
+            try {
+                CSVWriter writer = new CSVWriter(collection);
+                writer.writeCSVFile(commandArgs);
+            } catch (FileException e) {
+                System.out.println("Не удалось найти/создать файл");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * ИСПОЛЬНЯЕТ СКРИПТ
+     * ИСПОЛНЯЕТ СКРИПТ
+     *
      * @param commandArgs ПУТЬ ДО СКРИПТА
      */
     protected void executeScript(String commandArgs) {
         File file = new File(commandArgs);
 
-        if (file.exists() && file.canRead()) {
-            CommandInput reader = new FileCommandInput(new File(commandArgs));
+        try {
+            if (commandArgs.isEmpty()) {
+                System.out.println("Путь должен быть корректным, попробуйте снова");
+                commandArgs = inputNonNullString();
+            }
+        } catch (Exception e) {
+        }
+
+        try {
+
+
+            CommandInput reader = new FileCommandInput(file);
             CommandReader commandReader = new CommandReader(new CommandExecutor(collection, reader));
             commandReader.read(reader);
-        } else {
-            throw new FileException();
+        } catch (FileNotFoundException e) {
+            System.out.println("Файл не найден");
         }
+
     }
 
     /**
@@ -161,18 +195,23 @@ public class CommandExecutor {
 
     /**
      * ДОБАВЛЯЕТ ЭЛЕМЕНТ НА ДАННУЮ ПОЗИЦИЮ
+     *
      * @param commandArgs АРГУМЕНТ КОМАНДЫ, В ДАННОМ СЛУЧАЕ ПОЗИЦИЯ
      */
     protected void insertAtIndex(String commandArgs) {
-        int pos = Integer.parseInt(commandArgs);
-        if (pos < 0 || pos > collection.getCollection().size()) {
-            System.out.println("Введенная позиция находится вне коллекции, поэтому добавление произойдет в конец.");
-            add();
-        } else {
-            MusicBand element = createMusicBand(collection.getMusicsCount() + 1, new Date());
-            collection.insertElement(element, pos);
+        try {
+            int pos = Integer.parseInt(commandArgs);
+            if (pos < 0 || pos > collection.getCollection().size()) {
+                System.out.println("Введенная позиция находится вне коллекции, поэтому добавление произойдет в конец.");
+                add();
+            } else {
+                MusicBand element = createMusicBand(collection.getMusicsCount() + 1, new Date());
+                collection.insertElement(element, pos);
+            }
+            Collections.sort(collection.getCollection());
+        } catch (NumberFormatException e) {
+            System.out.println("Аргумент должен быть числом");
         }
-        Collections.sort(collection.getCollection());
 
     }
 
@@ -240,6 +279,7 @@ public class CommandExecutor {
 
     /**
      * ПРОВЕРЯЕТ КОРРЕКТНОСТЬ СТРОКИ
+     *
      * @return ВОЗВРАЩАЕТ СТРОКУ
      */
     private String inputNonNullString() {
@@ -252,6 +292,7 @@ public class CommandExecutor {
 
     /**
      * ПРОВЕРЯЕТ КОРРЕКТНОСТЬ ЧИСЛА
+     *
      * @return ВОЗВРАЩАЕТ ЧИСЛО
      */
     private int inputInt() {
@@ -266,6 +307,7 @@ public class CommandExecutor {
 
     /**
      * ПРОВЕРЯЕТ КОРРЕКТНОСТЬ ЧИСЛА
+     *
      * @return ВОЗВРАЩАЕТ ЧИСЛО
      */
     private long inputPositiveLong() {
@@ -282,19 +324,27 @@ public class CommandExecutor {
 
     /**
      * ПРОВЕРЯЕТ КОРРЕКТНОСТЬ ДАТЫ
+     *
      * @return ВОЗВРАЩАЕТ ДАТУ
      */
     private String inputDate() {
         while (true) {
             String input = reader.readLine();
-            if (Pattern.matches("^-?\\+?(\\d{1,4})[-](\\+?0[1-9]|\\+?1[0-2])[-](\\+?[0-2]?[1-9]|\\+?[1-3][0-1])$", input))
-                return input;
+            if (Pattern.matches("^-?\\+?(\\d{1,4})[-](\\+?0[1-9]|\\+?1[0-2])[-](\\+?[0-2]?[1-9]|\\+?[1-3][0-1])$", input)) {
+                try {
+                    LocalDate.parse(input);
+                    return input;
+                } catch (Exception e) {
+
+                }
+            }
             System.out.println("Неправильный формат даты, введите дату в формате yyyy-mm-dd:");
         }
     }
 
     /**
      * ПРОВЕРЯЕТ КОРРЕКТНОСТЬ ЖАНРА
+     *
      * @return ВОЗВРАЩАЕТ ЖАНР
      */
     private MusicGenre inputGenre() {
@@ -309,7 +359,8 @@ public class CommandExecutor {
 
     /**
      * СОЗДАЕТ НОВУЮ МУЗЫЧКУ
-     * @param id АЙДИ МУЗЫЧКИ
+     *
+     * @param id           АЙДИ МУЗЫЧКИ
      * @param creationDate ДАТА ИНИЦИАЛИЗАЦИИ МУЗЫЧКИ
      * @return ВОЗВРАЩАЕТ НОВУЮ МУЗЫЧКУ
      */

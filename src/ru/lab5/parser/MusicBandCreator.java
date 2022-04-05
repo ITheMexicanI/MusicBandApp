@@ -3,6 +3,8 @@ package ru.lab5.parser;
 import ru.lab5.mainObjects.*;
 import ru.lab5.parser.excetions.InvalidFieldValue;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +32,7 @@ public class MusicBandCreator {
     protected void createMusicBandStack(List<CSVObject> csvObjects) {
         Stack<MusicBand> stack = new Stack<>();
         long id;
+        String psevId;
 
         String name;
 
@@ -51,7 +54,15 @@ public class MusicBandCreator {
 
         for (CSVObject obj : csvObjects) {
             Map<String, String> fields = obj.getFields();
-            id = collection.getMusicsCount() + 1;
+
+            psevId = fields.get("id");
+            try {
+                id = Long.parseLong(psevId);
+                if (id <= 0) id *= (-1);
+            } catch (NumberFormatException e) {
+                id = collection.getMinId() + 1;
+            }
+            while (collection.getIds().contains(id)) id++;
 
             name = fields.get("name");
             checkNonNullString(name);
@@ -64,7 +75,18 @@ public class MusicBandCreator {
                 throw new InvalidFieldValue("Coords must be numbers");
             }
 
-            creationDate = new Date();
+            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+            try {
+                creationDate = format.parse(fields.get("creation_date"));
+            } catch (ParseException e) {
+                String dateString = format.format(new Date());
+                try {
+                    creationDate = format.parse(dateString);
+                } catch (ParseException ex) {
+                    creationDate = null;
+                    ex.printStackTrace();
+                }
+            }
 
             numberOfParticipants = Long.parseLong(fields.get("num_of_participants"));
             checkMoreThanZero(numberOfParticipants);

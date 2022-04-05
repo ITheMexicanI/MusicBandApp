@@ -107,7 +107,7 @@ public class CommandReader {
      * @return ВОЗВРАЩАЕТ КОМАНДУ РАЗДЕЛЕННУЮ НА КОМАНДУ И АРГУМЕНТ
      */
     private AbstractMap.SimpleEntry<Command, String> parseCommand(String stringCommand) {
-        if (stringCommand.equals(" ")) throw new InvalidExecuteCommand();
+        if (stringCommand.split(" ").length < 1) throw new InvalidExecuteCommand();
         else {
             String commandArgs;
             List<String> commandArr = Arrays.asList(stringCommand.split(" "));

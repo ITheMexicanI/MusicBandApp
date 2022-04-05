@@ -1,7 +1,9 @@
 package ru.lab5.mainObjects;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -9,6 +11,7 @@ import java.util.Stack;
  */
 public class MusicBandCollection {
     private Stack<MusicBand> musicBandStack = new Stack<>();
+    private List<Long> ids = new ArrayList<>();
     private java.time.LocalDate initializingDate;
 
     /**
@@ -26,12 +29,17 @@ public class MusicBandCollection {
         return musicBandStack.size();
     }
 
+    public List<Long> getIds() {
+        return ids;
+    }
+
     /**
      * ДОБАВЛЯЕТ МУЗЫЧКУ В СТЭК С МУЗЫЧОЙ
      * @param musicBand САМА МУЗЫЧКА
      */
     public void addMusicBand(MusicBand musicBand) {
         musicBandStack.add(musicBand);
+        ids.add(musicBand.getId());
     }
 
 
@@ -70,7 +78,9 @@ public class MusicBandCollection {
      * @param id ID ЭЛЕМЕНТА
      */
     public void removeById(long id) {
+        int size = getCollection().size();
         musicBandStack.removeIf(element -> element.getId() == id);
+        if (size > getCollection().size()) getIds().remove(id);
     }
 
     /**
@@ -97,6 +107,11 @@ public class MusicBandCollection {
             if (element.getId() == id) return element;
         }
         return null;
+    }
+
+    public long getMinId() {
+        Collections.sort(getIds());
+        return getIds().get(0);
     }
 }
 

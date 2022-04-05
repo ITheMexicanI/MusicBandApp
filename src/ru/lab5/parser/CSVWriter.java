@@ -31,15 +31,10 @@ public class CSVWriter {
      */
     public void writeCSVFile(String fileName) throws IOException {
         File file = new File(fileName);
-
-        if (!file.exists() && file.getParentFile().canExecute()) {
+        try {
             file.createNewFile();
             write(fileName);
-        } else if (!file.getParentFile().canExecute()) {
-            throw new FileException();
-        } else if (file.exists() && file.canWrite()){
-            write(fileName);
-        } else {
+        } catch (Exception e) {
             throw new FileException();
         }
     }
