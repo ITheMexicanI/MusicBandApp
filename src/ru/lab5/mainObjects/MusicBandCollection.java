@@ -73,6 +73,7 @@ public class MusicBandCollection {
         musicBandStack.forEach(System.out::println);
     }
 
+
     /**
      * УДАЛЯЕТ МУЗЫЧКУ ПО ДАННОМУ ID
      * @param id ID ЭЛЕМЕНТА

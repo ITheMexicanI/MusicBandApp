@@ -112,13 +112,13 @@ public class CommandExecutor {
      */
     protected void removeId(String commandArgs) {
         try {
-
             long id = Long.parseLong(commandArgs);
             MusicBand element = collection.getElementByID(id);
             if (element != null) {
                 System.out.println("Данный элемент был удален:");
                 System.out.println(element);
                 collection.removeById(id);
+                collection.getIds().remove(id);
             } else {
                 System.out.println("Элемента с таким id нет.");
                 System.out.println("Возврат в главное меню...");
@@ -133,6 +133,7 @@ public class CommandExecutor {
      */
     protected void clear() {
         collection.clearCollection();
+        collection.getIds().clear();
     }
 
     /**
@@ -150,7 +151,7 @@ public class CommandExecutor {
                 CSVWriter writer = new CSVWriter(collection);
                 writer.writeCSVFile(commandArgs);
             } catch (FileException e) {
-                System.out.println("Не удалось найти/создать файл");
+                System.out.println("Не удалось найти/создать файл или к нему нет доступа");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -165,22 +166,18 @@ public class CommandExecutor {
     protected void executeScript(String commandArgs) {
         File file = new File(commandArgs);
 
-        try {
-            if (commandArgs.isEmpty()) {
-                System.out.println("Путь должен быть корректным, попробуйте снова");
-                commandArgs = inputNonNullString();
-            }
-        } catch (Exception e) {
+        if (commandArgs.isEmpty()) {
+            System.out.println("Путь должен быть корректным, попробуйте снова");
+            commandArgs = inputNonNullString();
+            file = new File(commandArgs);
         }
 
         try {
-
-
             CommandInput reader = new FileCommandInput(file);
             CommandReader commandReader = new CommandReader(new CommandExecutor(collection, reader));
             commandReader.read(reader);
         } catch (FileNotFoundException e) {
-            System.out.println("Файл не найден");
+            System.out.println("Файл не найден или к нему нед доступа");
         }
 
     }
