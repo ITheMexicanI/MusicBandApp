@@ -8,6 +8,7 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 
 public class DatagramClient {
     public static DatagramChannel startClient() throws IOException {
@@ -18,22 +19,37 @@ public class DatagramClient {
 
     public static void sendMessage(DatagramChannel client, String message, SocketAddress serverAddress) throws IOException, InterruptedException {
         ByteBuffer request = ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8));
-        int isSending = client.send(request, serverAddress);
-
         ByteBuffer serverResponse = ByteBuffer.allocate(256);
-        SocketAddress isReceived = client.receive(serverResponse);
 
-        if (isSending != message.length() || isReceived == null) resendRequest();
+        outer:
+        while (true) {
+            System.out.println("Sending...");
+            Instant deadline = Instant.now().plusSeconds(1);
+            while (Instant.now().isBefore(deadline)) {
+                request.rewind();
+                int numSent = client.send(request, serverAddress);
+                if (numSent > 0) break;
+                Thread.sleep(100);
+            }
 
-        String responseFromServer = new String(serverResponse.array(), 0, serverResponse.array().length);
-        responseFromServer = responseFromServer.replace("\u0000", "");
-        System.out.println(responseFromServer);
-
-        if (responseFromServer.equals("")) {
-
+            deadline = Instant.now().plusSeconds(1);
+            while (Instant.now().isBefore(deadline)) {
+                SocketAddress address = client.receive(serverResponse);
+                if (serverAddress.equals(address)) break outer;
+                Thread.sleep(100);
+            }
         }
 
+        String responseFromServer = new String(serverResponse.array(), 0, serverResponse.position());
+        System.out.println(responseFromServer);
 
+
+        ByteBuffer confirmRequest = ByteBuffer.wrap("response confirm".getBytes(StandardCharsets.UTF_8));
+
+        while (true) {
+            int numSent = client.send(confirmRequest, serverAddress);
+            if (numSent > 0) break;
+        }
     }
 
     private static void resendRequest() {
