@@ -1,59 +1,88 @@
 package ru.lab5.client;
 
-import java.io.BufferedReader;
+import ru.lab5.common.commands.CommandReader;
+import ru.lab5.common.commands.CommandValidator;
+import ru.lab5.common.commands.inputSystem.CommandInput;
+import ru.lab5.common.commands.inputSystem.ConsoleCommandInput;
+import ru.lab5.common.network.Mark;
+import ru.lab5.common.network.Request;
+import ru.lab5.common.network.Response;
+import ru.lab5.common.network.Serializator;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
+import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
+import java.util.Stack;
 
 public class Client {
-    private final DatagramSocket socket;
-    private final InetAddress address;
-    private final int timeout = 100;
-
-    private byte[] clientBuffer = new byte[256];
-    private final byte[] serverBuffer = new byte[256];
-    private final byte[] confirmBuffer = "response confirm".getBytes(StandardCharsets.UTF_8);
-
-    public Client(DatagramSocket socket, String ip) throws UnknownHostException {
-        this.socket = socket;
-        this.address = InetAddress.getByName(ip);
+    public static DatagramChannel startClient() throws IOException {
+        DatagramChannel client = DatagramChannelBuilder.bindChannel(null);
+        client.configureBlocking(false);
+        return client;
     }
 
-    public void sendMessage(String request) throws IOException {
-        try {
-            // Отправка запроса на сервер
-            clientBuffer = request.getBytes(StandardCharsets.UTF_8);
-            DatagramPacket packetToServer = new DatagramPacket(clientBuffer, clientBuffer.length, address, 8080);
+    public static void sendMessage(DatagramChannel client, ByteArrayOutputStream message, SocketAddress serverAddress) throws IOException, InterruptedException {
+        ByteBuffer request = ByteBuffer.wrap(message.toByteArray());
+        ByteBuffer serverResponse = ByteBuffer.allocate(CommandReader.MAX_SIZE);
 
-            // Ожидание ответа от сервера и его обработка
-            socket.setSoTimeout(timeout);
-            socket.send(packetToServer);
+        outer:
+        while (true) {
+            System.out.println("Sending...");
+            Instant deadline = Instant.now().plusSeconds(1);
+            while (Instant.now().isBefore(deadline)) {
+                request.rewind();
+                int numSent = client.send(request, serverAddress);
+                if (numSent > 0) break;
+                Thread.sleep(100);
+            }
 
-            DatagramPacket serverResponse = new DatagramPacket(serverBuffer, serverBuffer.length);
-            socket.receive(serverResponse);
-            String messageFromServer = new String(serverResponse.getData(), 0, serverResponse.getLength());
-            System.out.println("Server response: " + messageFromServer);
-
-            // Отправка о подтверждение получения пакета
-            DatagramPacket confirmResponse = new DatagramPacket(confirmBuffer, confirmBuffer.length, address, 8080);
-            socket.send(confirmResponse);
-        } catch (SocketTimeoutException e) {
-            System.out.println("Ошибка отправки запроса...");
-            // TODO: переотправлять сообщения
+            deadline = Instant.now().plusSeconds(1);
+            while (Instant.now().isBefore(deadline)) {
+                SocketAddress address = client.receive(serverResponse);
+                if (serverAddress.equals(address)) break outer;
+                Thread.sleep(100);
+            }
         }
+
+        Response responseFromServer = (Response) Serializator.deserialize(serverResponse.array());
+        processResponse(Objects.requireNonNull(responseFromServer));
+
+        ByteBuffer confirmRequest = ByteBuffer.wrap(Objects.requireNonNull(Serializator.serialize(new Request(null, "response confirm"))).toByteArray());
+
+        while (true) {
+            int numSent = client.send(confirmRequest, serverAddress);
+            if (numSent > 0) break;
+        }
+    }
+
+    private static void processResponse(Response responseFromServer) {
+        String title = responseFromServer.getTitle();
+        Object message = responseFromServer.getMessage();
+        Mark mark = responseFromServer.getMark();
+
+        if (!title.isEmpty()) System.out.println(title);
+
+        if (mark.equals(Mark.STRING)) System.out.println((String) message);
+        else if (mark.equals(Mark.STACK)) ((Stack) message).forEach(System.out::println);
+        else if (mark.equals(Mark.LIST)) ((List) message).forEach(System.out::println);
     }
 
     public static void main(String[] args) throws IOException {
-        DatagramSocket socket = new DatagramSocket();
-        Client client = new Client(socket, "localhost");
-        System.out.println("Send some message to a server.");
+        DatagramChannel channel = startClient();
+        InetSocketAddress serverAddress = new InetSocketAddress("localhost", CommandReader.PORT);
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
-        while (true) {
-            client.sendMessage(reader.readLine());
-        }
+        CommandInput commandInput = new ConsoleCommandInput();
+        CommandReader commandReader = new CommandReader();
+        commandReader.setValidator(new CommandValidator(commandInput));
+        commandReader.setClient(new Client());
+        commandReader.setChannel(channel);
+        commandReader.setServerAddress(serverAddress);
+        commandReader.read(commandInput);
     }
-
 }
