@@ -5,13 +5,12 @@ import ru.lab5.common.commands.exceptions.InvalidExecuteCommand;
 import ru.lab5.common.commands.inputSystem.CommandInput;
 import ru.lab5.common.mainObjects.Album;
 import ru.lab5.common.mainObjects.MusicBand;
-import ru.lab5.common.network.Request;
-import ru.lab5.common.network.Response;
-import ru.lab5.common.network.Serializator;
+import ru.lab5.common.utils.Request;
+import ru.lab5.common.utils.Response;
+import ru.lab5.common.utils.Serializator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.util.*;

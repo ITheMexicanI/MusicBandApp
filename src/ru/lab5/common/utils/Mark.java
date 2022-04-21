@@ -1,4 +1,4 @@
-package ru.lab5.common.network;
+package ru.lab5.common.utils;
 
 public enum Mark {
     STRING,

@@ -1,9 +1,8 @@
-package ru.lab5.common.network;
+package ru.lab5.common.utils;
 
 import ru.lab5.common.commands.CommandReader;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 public class Serializator {
     public static ByteArrayOutputStream serialize(Object request) {

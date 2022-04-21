@@ -4,7 +4,7 @@ import ru.lab5.client.Client;
 import ru.lab5.common.commands.inputSystem.CommandInput;
 import ru.lab5.common.commands.inputSystem.FileCommandInput;
 import ru.lab5.common.mainObjects.*;
-import ru.lab5.common.network.Request;
+import ru.lab5.common.utils.Request;
 
 import java.io.*;
 import java.net.SocketAddress;

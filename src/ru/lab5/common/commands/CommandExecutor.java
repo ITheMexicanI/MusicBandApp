@@ -1,13 +1,9 @@
 package ru.lab5.common.commands;
 
-import ru.lab5.common.commands.inputSystem.CommandInput;
 import ru.lab5.common.mainObjects.*;
-import ru.lab5.common.network.Mark;
-import ru.lab5.common.network.Response;
-import ru.lab5.server.parser.CSVWriter;
-import ru.lab5.server.parser.excetions.FileException;
+import ru.lab5.common.utils.Mark;
+import ru.lab5.common.utils.Response;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 

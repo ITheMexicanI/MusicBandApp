@@ -1,4 +1,4 @@
-package ru.lab5.common.network;
+package ru.lab5.common.utils;
 
 import java.io.Serializable;
 

@@ -4,10 +4,10 @@ import ru.lab5.common.commands.CommandReader;
 import ru.lab5.common.commands.CommandValidator;
 import ru.lab5.common.commands.inputSystem.CommandInput;
 import ru.lab5.common.commands.inputSystem.ConsoleCommandInput;
-import ru.lab5.common.network.Mark;
-import ru.lab5.common.network.Request;
-import ru.lab5.common.network.Response;
-import ru.lab5.common.network.Serializator;
+import ru.lab5.common.utils.Mark;
+import ru.lab5.common.utils.Request;
+import ru.lab5.common.utils.Response;
+import ru.lab5.common.utils.Serializator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
