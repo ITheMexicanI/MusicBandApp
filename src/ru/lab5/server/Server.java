@@ -11,9 +11,7 @@ import ru.lab5.server.parser.CSVWriter;
 import ru.lab5.server.parser.excetions.FileException;
 import sun.misc.Signal;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -39,12 +37,26 @@ public class Server {
     }
 
     public static void main(String[] args) throws SocketException {
+        String fileName = null;
+        if (args.length < 1) {
+            System.out.println("В аргументе не передан файл");
+            System.out.println("Введите файл");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            try {
+                fileName = reader.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(-1);
+            }
+        } else {
+            fileName = args[0];
+        }
         DatagramSocket datagramSocket = new DatagramSocket(CommandReader.PORT);
         Server server = new Server(datagramSocket);
         logger.info("Server starts...");
 
         try {
-            server.run(args[0]);
+            server.run(fileName);
         } catch (IOException e) {
             logger.info("Server error");
         }
@@ -55,7 +67,9 @@ public class Server {
 
         CSVReader fileReader = new CSVReader(collection);
         fileReader.readCSVFile(path);
-        setupSignalHandler(collection);  // TODO: доделать
+        setupSignalHandler(collection);
+        setupShutDownWork(collection);
+
 
         commandReader = new CommandReader();
         commandReader.setExecutor(new CommandExecutor(collection));
@@ -108,15 +122,25 @@ public class Server {
         return new DatagramPacket(response.toByteArray(), response.toByteArray().length, packetFromClient.getAddress(), packetFromClient.getPort());
     }
 
-    private static void setupSignalHandler(MusicBandCollection database) {
+    private void setupSignalHandler(MusicBandCollection database) {
         Signal.handle(new Signal("TSTP"), signal -> {
-            logger.info("Saving database...");
-            try {
-                CSVWriter writer = new CSVWriter(database);
-                writer.writeCSVFile("database.csv");
-            } catch (FileException | IOException e) {
-                logger.info("Saving error. No such file.");
-            }
+            saveData(database);
         });
+    }
+
+    private void setupShutDownWork(MusicBandCollection database){
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            saveData(database);
+        }));
+    }
+    private void saveData(MusicBandCollection database) {
+        logger.info("Saving database...");
+        try {
+            CSVWriter writer = new CSVWriter(database);
+            writer.writeCSVFile("database.csv");
+            logger.info("Saved");
+        } catch (FileException | IOException e) {
+            logger.info("Saving error. No such file.");
+        }
     }
 }

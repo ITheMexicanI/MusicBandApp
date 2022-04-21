@@ -32,7 +32,8 @@ public class CSVReader {
         File file = new File(fileName);
 
         if (!file.exists() || !file.canRead()) {
-            throw new FileException();
+            System.out.println("The file does not exist or there is no access to it");
+            System.exit(-1);
         }
 
         FileInputStream fis = null;

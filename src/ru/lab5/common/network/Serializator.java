@@ -33,7 +33,8 @@ public class Serializator {
             System.out.println("Не достаточно памяти для передачи объекта");
             return null;
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Ошибка десериализации, класс не найден");
+            System.out.println("Ошибка десериализации, класс не найден или сервер недоступен");
+            System.exit(0);
             return null;
         }
     }

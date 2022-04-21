@@ -32,7 +32,7 @@ public class Client {
         ByteBuffer serverResponse = ByteBuffer.allocate(CommandReader.MAX_SIZE);
 
         outer:
-        while (true) {
+        for (int i = 0; i < 5; i++) {
             System.out.println("Sending...");
             Instant deadline = Instant.now().plusSeconds(1);
             while (Instant.now().isBefore(deadline)) {
