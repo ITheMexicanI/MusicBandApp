@@ -6,8 +6,8 @@ import java.io.Serializable;
  * КЛАСС, ХРАНЯЩИЙ В СЕБЕ ИНФОРМАЦИЮ ОБ АЛЬБОМЕ МКУЗЫЧКИ
  */
 public class Album implements Comparable<Album>, Serializable {
-    private String name; //Поле не может быть null, Строка не может быть пустой
-    private int tracks; //Значение поля должно быть больше 0
+    private final String name; //Поле не может быть null, Строка не может быть пустой
+    private final int tracks; //Значение поля должно быть больше 0
 
     /**
      * @param name ИМЕЧКО АЛЬБОМА

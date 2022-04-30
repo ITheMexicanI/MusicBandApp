@@ -10,7 +10,7 @@ import java.util.Map;
  * БАЗОВЫЙ CSV ОБЪЕКТ ПРОСТО ХРАНИТ ПРОЧТЕННЫЙ CSV ФАЙЛ
  */
 public class CSVObject {
-    private Map<String, String> fields = new HashMap<>();
+    private final Map<String, String> fields = new HashMap<>();
 
     /**
      * @param headers   ЗАГАЛОВКИ CSV ФАЙЛА

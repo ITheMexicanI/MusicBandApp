@@ -1,20 +1,18 @@
 package ru.lab5.common.mainObjects;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 /**
  * КЛАСС, ХРАНЯЩИЙ И УПРАВЛЯЮЩИЙ МУЗЫЧКОЙ
  */
 public class MusicBandCollection {
     private Stack<MusicBand> musicBandStack = new Stack<>();
-    private List<Long> ids = new ArrayList<>();
-    private java.time.LocalDate initializingDate;
+    private final List<Long> ids = new ArrayList<>();
+    private final java.time.LocalDate initializingDate;
 
     /**
      * КОНСТРУКТОР МУЗЫЧКИ ИНИЦИАЛИЗИРУЕТ ДАТУ ЗАГРУЗКИ
@@ -66,13 +64,6 @@ public class MusicBandCollection {
      */
     public void clearCollection() {
         musicBandStack = new Stack<>();
-    }
-
-    /**
-     * ВЫВОДИТ НА ЭКРАН ВСЮ МУЗЫЧКУ
-     */
-    public String showCollection() {
-        return musicBandStack.stream().map(x -> x.toString()).collect(Collectors.joining("\n"));
     }
 
 

@@ -1,7 +1,6 @@
 package ru.lab5.common.mainObjects;
 
 import java.io.Serializable;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
@@ -65,13 +64,6 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
      */
     public long getId() {
         return id;
-    }
-
-    /**
-     * @return ВОЗВРАЩАЕТ ДАТУ ДОБАВЛЕНИЯ МУЗЫЧКИ
-     */
-    public Date getCreationDate() {
-        return creationDate;
     }
 
     /**

@@ -257,7 +257,7 @@ public class CommandValidator {
                 try {
                     LocalDate.parse(input);
                     return input;
-                } catch (Exception e) {
+                } catch (Exception ignored) {
 
                 }
             }

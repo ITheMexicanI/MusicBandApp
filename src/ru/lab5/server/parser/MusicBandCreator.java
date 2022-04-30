@@ -15,7 +15,7 @@ import java.util.Stack;
  * ЗАНИМАЕТСЯ СОЗДАНИЕМ И ПОВЕРКОЙ НА ПРАВИЛЬНОСТЬ ЗАПОЛНЕНИЯ ПОЛЕЙ МУЗЫЧКИ
  */
 public class MusicBandCreator {
-    private MusicBandCollection collection;
+    private final MusicBandCollection collection;
 
     /**
      * @param collection - СТЭК ХРАНЯЩИЙ МУЗЫЧКУ
@@ -30,7 +30,6 @@ public class MusicBandCreator {
      * @param csvObjects ХРАНИТ СЫРЫЕ CSV АБЪЕКТЫ
      */
     protected void createMusicBandStack(List<CSVObject> csvObjects) {
-        Stack<MusicBand> stack = new Stack<>();
         long id;
         String psevId;
 
@@ -101,7 +100,7 @@ public class MusicBandCreator {
                 albumName = fields.get("album_name");
                 albumTracks = Integer.parseInt(fields.get("album_tracks"));
                 checkNonNullString(albumName);
-                checkMoreThanZero((long) albumTracks);
+                checkMoreThanZero(albumTracks);
                 album = new Album(albumName, albumTracks);
             } catch (NumberFormatException e) {
                 throw new InvalidFieldValue("Number of album tracks must be number: " + fields.get("album_tracks"));

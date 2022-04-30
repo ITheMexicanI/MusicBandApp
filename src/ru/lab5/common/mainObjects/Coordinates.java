@@ -6,8 +6,8 @@ import java.io.Serializable;
  * КЛАСС КООРДИНАТ МУЗЫЧКИ
  */
 public class Coordinates implements Serializable {
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     /**
      * @param x X КООРДИНАТА

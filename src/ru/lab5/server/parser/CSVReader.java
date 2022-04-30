@@ -1,7 +1,6 @@
 package ru.lab5.server.parser;
 
 import ru.lab5.common.mainObjects.MusicBandCollection;
-import ru.lab5.server.parser.excetions.FileException;
 import ru.lab5.server.parser.excetions.InvalidHeaderException;
 
 import java.io.*;
@@ -15,10 +14,11 @@ import java.util.Objects;
  */
 public class CSVReader {
     private static final List<String> primeHeaders = Arrays.asList("id,name,cor_x,cor_y,creation_date,num_of_participants,date,genre,album_name,album_tracks".split(","));
+    private final List<CSVObject> objects = new ArrayList<>();
+    private final MusicBandCollection collection;
+
     private DataInputStream dis;
     private List<String> headers;
-    private List<CSVObject> objects = new ArrayList<>();
-    private MusicBandCollection collection;
 
     public CSVReader(MusicBandCollection collection) {
         this.collection = collection;

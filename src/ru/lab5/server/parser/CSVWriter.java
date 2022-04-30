@@ -5,7 +5,6 @@ import ru.lab5.common.mainObjects.MusicBandCollection;
 import ru.lab5.server.parser.excetions.FileException;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Stack;
@@ -14,7 +13,7 @@ import java.util.Stack;
  * ЗАНИМАЕТСЯ ЗАПИСЬЮ В CSV ФАЙЛ
  */
 public class CSVWriter {
-    private MusicBandCollection collection;
+    private final MusicBandCollection collection;
 
     /**
      * @param collection - СТЭК ХРАНЯЩИЙ МУЗЫЧКУ
@@ -30,9 +29,7 @@ public class CSVWriter {
      * @throws FileException МОЖЕТ ВЫВАЛИЦА ПРИ ОШИБАХ ПРИ ЧТЕНИИ ФАЙЛА
      */
     public void writeCSVFile(String fileName) throws IOException {
-        File file = new File(fileName);
         try {
-            file.createNewFile();
             write(fileName);
         } catch (Exception e) {
             throw new FileException();

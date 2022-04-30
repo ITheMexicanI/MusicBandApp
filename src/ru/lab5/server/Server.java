@@ -16,6 +16,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class Server {
@@ -119,19 +120,15 @@ public class Server {
         Object argument = clientRequest.getArgument();
 
         ByteArrayOutputStream response = Serializator.serialize(commandReader.executeCommand(command, argument));
-        return new DatagramPacket(response.toByteArray(), response.toByteArray().length, packetFromClient.getAddress(), packetFromClient.getPort());
+        return new DatagramPacket(Objects.requireNonNull(response).toByteArray(), response.toByteArray().length, packetFromClient.getAddress(), packetFromClient.getPort());
     }
 
     private void setupSignalHandler(MusicBandCollection database) {
-        Signal.handle(new Signal("TSTP"), signal -> {
-            saveData(database);
-        });
+        Signal.handle(new Signal("TSTP"), signal -> saveData(database));
     }
 
     private void setupShutDownWork(MusicBandCollection database){
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            saveData(database);
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> saveData(database)));
     }
     private void saveData(MusicBandCollection database) {
         logger.info("Saving database...");

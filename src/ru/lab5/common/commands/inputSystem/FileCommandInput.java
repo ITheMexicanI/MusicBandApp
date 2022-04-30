@@ -6,9 +6,9 @@ import java.io.*;
  * ЧИТАТЕЛЬ ИЗ ФАЙЛА
  */
 public class FileCommandInput implements CommandInput {
-    FileInputStream fis = null;
-    BufferedInputStream bis = null;
-    DataInputStream dis = null;
+    FileInputStream fis;
+    BufferedInputStream bis;
+    DataInputStream dis;
 
     /**
      * ИНИЦИАЛИЗИРУЕТ ВСЕ, ЧТОБЫ ПРОЧИТАТЬ ИЗ ФАЙЛА

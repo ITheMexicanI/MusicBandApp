@@ -3,9 +3,9 @@ package ru.lab5.common.utils;
 import java.io.Serializable;
 
 public class Response implements Serializable {
-    private String title;
-    private Object message;
-    private Mark mark;
+    private final String title;
+    private final Object message;
+    private final Mark mark;
 
     public Response(String title, Object message, Mark mark) {
         this.title = title;
