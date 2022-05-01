@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Main-Class: ru.lab5.client.Client
+Main-Class: ru.lab.client.Client
 Class-Path: ru/lab5/client ru/lab5/common
 
