@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * КЛАСС, ХРАНЯЩИЙ В СЕБЕ БАЗОВЫЙ ЭЛЕМЕНТ МУЗЫЧКИ
@@ -109,6 +110,10 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
         this.creationDate = creationDate;
     }
 
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
     /**
      * СРАВНИВАЕТ МУЗЫЧКИ ПО ИМЕНИ, СОРТИРОВКА ПО УМОЛЧАНИЮ
      * @param o - ДРУГАЯ МУЗЫЧКА
@@ -147,5 +152,18 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
                 establishmentDate.toString() + "," +
                 genre.toString() + "," +
                 bestAlbum.getName() + "," + bestAlbum.getTracks();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MusicBand musicBand = (MusicBand) o;
+        return id == musicBand.id && numberOfParticipants == musicBand.numberOfParticipants && Objects.equals(name, musicBand.name) && Objects.equals(coordinates, musicBand.coordinates) && Objects.equals(creationDate, musicBand.creationDate) && Objects.equals(establishmentDate, musicBand.establishmentDate) && genre == musicBand.genre && Objects.equals(bestAlbum, musicBand.bestAlbum);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, coordinates, creationDate, numberOfParticipants, establishmentDate, genre, bestAlbum);
     }
 }

@@ -137,7 +137,7 @@ public class CommandValidator {
      */
     protected Request updateId(String commandArgs, User user) {
         try {
-            long id = Long.parseLong(commandArgs);
+            int id = Integer.parseInt(commandArgs);
             System.out.println("Изменение элемента коллекции:");
             return new Request(Command.UPDATE_ID, new AbstractMap.SimpleEntry<>(id, createMusicBand()), user);
         } catch (NumberFormatException e) {
@@ -154,7 +154,7 @@ public class CommandValidator {
      */
     protected Request removeId(String commandArgs, User user) {
         try {
-            long id = Long.parseLong(commandArgs);
+            int id = Integer.parseInt(commandArgs);
             return new Request(Command.REMOVE_BY_ID, id, user);
         } catch (NumberFormatException e) {
             System.out.println("Аргумент должен быть числом, возврат в главное меню...");
@@ -177,7 +177,7 @@ public class CommandValidator {
      * @param commandArgs ПУТЬ ДО СКРИПТА
      * @param user
      */
-    protected Request executeScript(String commandArgs, DatagramChannel channel, Client client, SocketAddress serverAddress, User user) { //TODO: удалить юзера????
+    protected Request executeScript(String commandArgs, DatagramChannel channel, Client client, SocketAddress serverAddress, User user) {
         File file = new File(commandArgs);
 
         if (commandArgs.isEmpty()) {
@@ -194,7 +194,7 @@ public class CommandValidator {
             commandReader.setClient(client);
             commandReader.setServerAddress(serverAddress);
             commandReader.read(commandInput);
-
+            return new Request(Command.EXECUTE, null, user);
         } catch (FileNotFoundException e) {
             System.out.println("Файл не найден или к нему нет доступа");
         }
@@ -207,24 +207,6 @@ public class CommandValidator {
     protected void exit() {
         System.out.println("Закрытие программы...");
         System.exit(0);
-    }
-
-    /**
-     * ДОБАВЛЯЕТ ЭЛЕМЕНТ НА ДАННУЮ ПОЗИЦИЮ
-     *
-     * @param commandArgs АРГУМЕНТ КОМАНДЫ, В ДАННОМ СЛУЧАЕ ПОЗИЦИЯ
-     * @param user
-     */
-    protected Request insertAtIndex(String commandArgs, User user) {
-        try {
-            int pos = Integer.parseInt(commandArgs);
-            System.out.println("Добавление нового элемента в коллекцию:");
-            return new Request(Command.INSERT_AT, new AbstractMap.SimpleEntry<>(pos, createMusicBand()), user);
-        } catch (NumberFormatException e) {
-            System.out.println("Аргумент должен быть числом, возврат в главное меню...");
-            return null;
-        }
-
     }
 
     /**

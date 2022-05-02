@@ -74,13 +74,6 @@ public class Client {
 
         Response responseFromServer = (Response) Serializator.deserialize(serverResponse.array());
         processResponse(Objects.requireNonNull(responseFromServer));
-
-        ByteBuffer confirmRequest = ByteBuffer.wrap(Objects.requireNonNull(Serializator.serialize(new Request(null, "response confirm", user))).toByteArray());
-
-        while (true) {
-            int numSent = client.send(confirmRequest, serverAddress);
-            if (numSent > 0) break;
-        }
     }
 
     private void processResponse(Response responseFromServer) {
@@ -108,10 +101,6 @@ public class Client {
 
     public User getUser() {
         return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public static void main(String[] args) {

@@ -5,56 +5,58 @@ import ru.lab.common.commands.CommandExecutor;
 import ru.lab.common.commands.CommandReader;
 import ru.lab.common.mainObjects.MusicBandCollection;
 import ru.lab.common.utils.*;
-import ru.lab.server.database.DataBaseHelper;
-import ru.lab.server.parser.CSVReader;
 import ru.lab.server.parser.CSVWriter;
 import ru.lab.server.parser.excetions.FileException;
-import sun.misc.Signal;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
+import java.sql.SQLException;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-public class Server {
+public class Server implements Runnable {
     public static final Logger logger = Logger.getLogger(Server.class.getSimpleName());
 
     private final DatagramSocket socket;
 
-    private final byte[] clientRequestBuffer = new byte[CommandReader.MAX_SIZE];
-    private final byte[] clientConfirmBuffer = new byte[CommandReader.MAX_SIZE];
-
-    private DatagramPacket packetFromClient;
-    private Request clientRequest;
-
     private CommandReader commandReader;
     private DataBaseHelper database;
 
-    public Server(DatagramSocket socket) {
-        this.socket = socket;
+    private static String path;
+
+    private final ExecutorService readPool = Executors.newCachedThreadPool();
+
+    public Server() throws SocketException {
+        this.socket = new DatagramSocket(CommandReader.PORT);
     }
 
     public static void main(String[] args) throws SocketException {
-        DatagramSocket datagramSocket = new DatagramSocket(CommandReader.PORT);
-        Server server = new Server(datagramSocket);
-
-        try {
-            logger.info("Server started");
-            server.run(server.getFileFromArgs(args));
-        } catch (IOException e) {
-            logger.info("Server error");
-        }
+        logger.info("Server started");
+        path = getFileFromArgs(args);
+        new Server().run();
     }
 
-    public void run(String path) throws IOException {
-        MusicBandCollection collection = new MusicBandCollection();
+    @Override
+    public void run() {
         initializeDataBase();
+        MusicBandCollection collection = null;
+        try {
+            collection = database.load();
+        } catch (SQLException e) {
+            logger.info("Database error");
+            e.printStackTrace();
+        }
 
-        CSVReader fileReader = new CSVReader(collection);
-        fileReader.readCSVFile(path);
+//        CSVReader fileReader = new CSVReader(collection);
+//        fileReader.readCSVFile(path);
+
 //        setupSignalHandler(collection);
 //        setupShutDownWork(collection);
 
@@ -62,15 +64,23 @@ public class Server {
         commandReader.setExecutor(new CommandExecutor(collection, database));
 
         while (true) {
-            socket.setSoTimeout(0);
-            packetFromClient = new DatagramPacket(clientRequestBuffer, clientRequestBuffer.length);
-            socket.receive(packetFromClient);
+            try {
+                final byte[] clientRequestBuffer = new byte[CommandReader.MAX_SIZE];
 
-            clientRequest = (Request) Serializator.deserialize(packetFromClient.getData());
-            String messageFromClient = clientRequest.toString();
-            logger.info("Message from client: " + messageFromClient);
+                socket.setSoTimeout(0);
+                DatagramPacket packetFromClient = new DatagramPacket(clientRequestBuffer, clientRequestBuffer.length);
+                socket.receive(packetFromClient);
 
-            processRequest();
+                readPool.execute(() -> {
+                    Request clientRequest = (Request) Serializator.deserialize(packetFromClient.getData());
+                    String messageFromClient = clientRequest.toString();
+                    logger.info("Message from client: " + messageFromClient);
+
+                    processRequest(packetFromClient, clientRequest);
+                });
+            } catch (IOException e) {
+                logger.info("IOException in setSocketTimeout");
+            }
         }
     }
 
@@ -78,64 +88,41 @@ public class Server {
         database = new DataBaseHelper();
     }
 
-    private void processRequest() {
-        DatagramPacket packetToClient = createResponse();
+    private void processRequest(DatagramPacket packetFromClient, Request clientRequest) {
+        new Thread(() -> {
+            DatagramPacket packetToClient = createResponse(packetFromClient, clientRequest);
 
-        for (int i = 0; i < 3; i++) {
-            try {
-                socket.send(packetToClient);
-                DatagramPacket packetWithClientConfirm = new DatagramPacket(clientConfirmBuffer, clientConfirmBuffer.length);
-                int timeout = 1000; // 1 сек
-                socket.setSoTimeout(timeout);
-                socket.receive(packetWithClientConfirm);
-
-                Request request = (Request) Serializator.deserialize(packetWithClientConfirm.getData());
-                logger.info("Response was received: " + request.getArgument().equals("response confirm"));
-                break;
-            } catch (SocketTimeoutException e) {
-                if (i < 3) logger.info("Confirmation of response was not received. Resending...");
-                else logger.info("Client has died");
-            } catch (IOException e) {
-                logger.info("Server/Client error");
-            }
-        }
+            new Thread(() -> {
+                try {
+                    socket.send(packetToClient);
+                } catch (IOException e) {
+                    logger.info("Client/Server error");
+                }
+            }).start();
+        }).start();
     }
 
-    private DatagramPacket createResponse() {
+    private DatagramPacket createResponse(DatagramPacket packetFromClient, Request clientRequest) {
         ByteArrayOutputStream response;
         Command command = clientRequest.getCommand();
         Object argument = clientRequest.getArgument();
 
-        boolean isAuthorized = checkClient();
+        boolean isAuthorized = checkClient(clientRequest);
 
         if (isAuthorized || command.equals(Command.HELP) || command.equals(Command.LOG) || command.equals(Command.REG)) {
-            response = Serializator.serialize(commandReader.executeCommand(command, argument));
+            response = Serializator.serialize(commandReader.executeCommand(command, argument, clientRequest.getUser()));
         } else {
             response = Serializator.serialize(new Response("Вы не авторизованы, зарегестрируйтесь или войдите в аккаунт.", "Открыть справку: 'help'", Mark.STRING));
         }
         return new DatagramPacket(Objects.requireNonNull(response).toByteArray(), response.toByteArray().length, packetFromClient.getAddress(), packetFromClient.getPort());
     }
 
-    private boolean checkClient() {
+    private boolean checkClient(Request clientRequest) {
         User clientUser = clientRequest.getUser();
         if (clientUser == null) return false;
         if (clientUser.getLogin() == null || clientUser.getPassword() == null) return false;
         return database.checkUser(clientUser);
     }
-
-//    private void setupSignalHandler(MusicBandCollection database) {
-//        Signal.handle(new Signal("TSTP"), signal -> {
-//            saveData(database);
-//            socket.close();
-//        });
-//    }
-//
-//    private void setupShutDownWork(MusicBandCollection database) {
-//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-//            saveData(database);
-//            socket.close();
-//        }));
-//    }
 
     private void saveData(MusicBandCollection database) {
         logger.info("Saving database...");
@@ -148,7 +135,7 @@ public class Server {
         }
     }
 
-    private String getFileFromArgs(String[] args) {
+    private static String getFileFromArgs(String[] args) {
         String fileName = null;
 
         if (args.length < 1) {

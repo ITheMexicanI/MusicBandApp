@@ -5,9 +5,9 @@ import ru.lab.common.commands.Command;
 import java.io.Serializable;
 
 public class Request implements Serializable {
-    private Command command;
-    private Object argument;
-    private User user;
+    private final Command command;
+    private final Object argument;
+    private final User user;
 
     public Request(Command command, Object argument, User user) {
         this.command = command;

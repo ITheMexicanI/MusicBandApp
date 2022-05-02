@@ -18,7 +18,6 @@ public enum Command implements Serializable {
     CLEAR("clear"),
     EXECUTE("execute"),
     EXIT("exit"),
-    INSERT_AT("insert"),
     SHUFFLE("shuffle"),
     REORDER("reorder"),
     SORT("sort"),
@@ -57,8 +56,6 @@ public enum Command implements Serializable {
                 return REMOVE_BY_ID;
             case "clear":
                 return CLEAR;
-            case "insert":
-                return INSERT_AT;
             case "execute":
                 return EXECUTE;
             case "exit":

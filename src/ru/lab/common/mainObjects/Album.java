@@ -1,6 +1,7 @@
 package ru.lab.common.mainObjects;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * КЛАСС, ХРАНЯЩИЙ В СЕБЕ ИНФОРМАЦИЮ ОБ АЛЬБОМЕ МКУЗЫЧКИ
@@ -49,5 +50,18 @@ public class Album implements Comparable<Album>, Serializable {
     public int compareTo(Album o) {
         if (name.equals(o.getName())) return tracks - o.getTracks();
         return name.compareTo(o.getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Album album = (Album) o;
+        return tracks == album.tracks && Objects.equals(name, album.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, tracks);
     }
 }

@@ -1,10 +1,7 @@
 package ru.lab.common.mainObjects;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * КЛАСС, ХРАНЯЩИЙ И УПРАВЛЯЮЩИЙ МУЗЫЧКОЙ
@@ -106,6 +103,19 @@ public class MusicBandCollection {
     public long getMinId() {
         Collections.sort(getIds());
         return getIds().get(0);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MusicBandCollection that = (MusicBandCollection) o;
+        return musicBandStack.equals(((MusicBandCollection) o).getCollection());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(musicBandStack, ids, initializingDate);
     }
 }
 

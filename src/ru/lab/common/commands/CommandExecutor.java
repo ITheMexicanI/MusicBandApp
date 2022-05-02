@@ -4,9 +4,12 @@ import ru.lab.common.mainObjects.*;
 import ru.lab.common.utils.Mark;
 import ru.lab.common.utils.Response;
 import ru.lab.common.utils.User;
-import ru.lab.server.database.DataBaseHelper;
+import ru.lab.server.Server;
+import ru.lab.server.DataBaseHelper;
 
+import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 
@@ -14,7 +17,8 @@ import java.util.stream.Collectors;
  * ЧЕЛ, КОТОРЫЙ УМЕЕТ ИСПОЛНЯТЬ КОМАНДЫ И ДРУЖИТ С КОЛЛЕКЦИЕЙ
  */
 public class CommandExecutor {
-    private final MusicBandCollection collection;
+    private final ReentrantLock lock = new ReentrantLock();
+    private MusicBandCollection collection;
     private final DataBaseHelper database;
 
     public CommandExecutor(MusicBandCollection collection, DataBaseHelper database) {
@@ -34,7 +38,7 @@ public class CommandExecutor {
                 "'execute PATH'          : считать и исполнить скрипт из указанного файла.(PATH - путь до файла-скрипта)\n" +
                 "'exit'                  : завершить программу (без сохранения в файл)\n" +
                 "'insert X'              : добавить новый элемент в заданную позицию (X - позиция)\n" +
-                "'shuffle'               : перемешать элементы коллекции в случайном порядке\n" +
+                "'shuffle'               : перемешать элaddементы коллекции в случайном порядке\n" +
                 "'reorder'               : отсортировать коллекцию в порядке\n" +
                 "'showByAlbum'           : вывести элементы, значение поля bestAlbum которых равно заданному\n" +
                 "'showGreaterThanAlbum'  : вывести элементы, значение поля bestAlbum которых больше заданного\n" +
@@ -55,63 +59,62 @@ public class CommandExecutor {
         return new Response("Коллекция:", collection.getCollection(), Mark.STACK);
     }
 
-    protected Response add(MusicBand element) {
-        long id = collection.getMusicsCount() + 1;
-        while (collection.getIds().contains(id)) id++;
+    protected Response add(MusicBand element, User user) {
+        try {
+            int id = database.getIdSeq();
 
-        collection.addMusicBand(element);
-        element.setId(id);
-        element.setCreationDate(new Date());
-
+            element.setId(id);
+            element.setCreationDate(new Date());
+            collection.addMusicBand(element);
+            database.add(element, id, user);
+        } catch (SQLException e) {
+            Server.logger.info("Database work error");
+            e.printStackTrace();
+        }
         return new Response("", "Элемент добавлен в коллекцию", Mark.STRING);
     }
 
-    protected Response updateId(AbstractMap.SimpleEntry<Long, MusicBand> commandArgs) {
-        long id = commandArgs.getKey();
-        MusicBand element = collection.getElementByID(id);
+    protected Response updateId(AbstractMap.SimpleEntry<Integer, MusicBand> commandArgs, User user) {
+        try {
+            int id = commandArgs.getKey();
+            MusicBandCollection newCol = database.updateById(id, commandArgs.getValue(), user);
 
-        if (element != null) {
-            element.updateElement(commandArgs.getValue());
-            return new Response("Измененный элемент:", element.toString(), Mark.STRING);
-        } else {
-            return new Response("Элемента с таким id нет.", "Возрат в главное меню...", Mark.STRING);
+            if (!newCol.equals(collection)) {
+                collection = database.load();
+                return new Response("Измененный элемент:", collection.getElementByID(id).toString(), Mark.STRING);
+            }
+        } catch (SQLException e) {
+            Server.logger.info("Database work error");
+            e.printStackTrace();
         }
+        return new Response("Элемента с таким id нет или элемент вам не принадлежит.", "Возрат в главное меню...", Mark.STRING);
     }
 
-    protected Response removeId(long id) {
-        MusicBand element = collection.getElementByID(id);
-        if (element != null) {
-            collection.removeById(id);
-            collection.getIds().remove(id);
-            return new Response("Элемент, который был удален:", element.toString(), Mark.STRING);
-        } else {
-            return new Response("Элемента с таким id нет.", "Возрат в главное меню...", Mark.STRING);
+    protected Response removeId(int id, User user) {
+        try {
+            MusicBandCollection newCol = database.removeById(id, user);
+            if (!newCol.equals(collection)) {
+                String msg = collection.getElementByID(id).toString();
+                collection = database.load();
+                return new Response("Элемент, который был удален:", msg, Mark.STRING);
+            }
+        } catch (SQLException e) {
+            Server.logger.info("Database work error");
+            e.printStackTrace();
         }
+        return new Response("Элемента с таким id нет или элемент вам не принадлежит.", "Возрат в главное меню...", Mark.STRING);
     }
 
-    protected Response clear() {
-        collection.clearCollection();
-        collection.getIds().clear();
-        return new Response("Коллекция очищена", "Возрат в главное меню...", Mark.STRING);
-    }
-
-    protected Response insertAtIndex(AbstractMap.SimpleEntry<Integer, MusicBand> commandArgs) {
-        int pos = commandArgs.getKey();
-        MusicBand element = commandArgs.getValue();
-
-        long id = collection.getMusicsCount() + 1;
-        while (collection.getIds().contains(id)) id++;
-
-        element.setId(id);
-        element.setCreationDate(new Date());
-
-        if (pos < 0 || pos > collection.getCollection().size()) {
-            collection.addMusicBand(element);
-            return new Response("Введенная позиция находится вне коллекции, поэтому добавление произойдет в конец.", "Возрат в главное меню...", Mark.STRING);
-        } else {
-            collection.insertElement(element, pos);
-            return new Response("Элемент добавлен в коллекцию.", "Возрат в главное меню...", Mark.STRING);
+    protected Response clear(User user) {
+        try {
+            database.clear(user);
+            collection = database.load();
+        } catch (SQLException e) {
+            Server.logger.info("Database work error");
+            e.printStackTrace();
         }
+
+        return new Response("Коллекция очищена от элементов, принадлежащих вам.", "Возрат в главное меню...", Mark.STRING);
     }
 
     protected Response shuffle() {
@@ -142,11 +145,15 @@ public class CommandExecutor {
     }
 
     protected Response reg(User user) {
-        boolean isContains = database.isContainsUserByLogin(user);
+        try {
+            boolean isContains = database.isContainsUserByLogin(user);
 
-        if (!isContains) {
-            database.addUser(user);
-            return new Response("Вы успешно зарегестрировались >.<", user, Mark.USER);
+            if (!isContains) {
+                database.addUser(user);
+                return new Response("Вы успешно зарегестрировались >.<", user, Mark.USER);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         return new Response("Упс, пользователь с таким именем уже существует, возврат в главное меню >.<", null, Mark.USER);
@@ -160,6 +167,10 @@ public class CommandExecutor {
         }
 
         return new Response("Неправильный логин или пароль, возврат в главное меню >.<", null, Mark.USER);
+    }
+
+    public ReentrantLock getLock() {
+        return lock;
     }
 }
 

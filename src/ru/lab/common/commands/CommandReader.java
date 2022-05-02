@@ -5,23 +5,22 @@ import ru.lab.common.commands.exceptions.InvalidExecuteCommand;
 import ru.lab.common.commands.inputSystem.CommandInput;
 import ru.lab.common.mainObjects.Album;
 import ru.lab.common.mainObjects.MusicBand;
-import ru.lab.common.utils.Request;
-import ru.lab.common.utils.Response;
-import ru.lab.common.utils.Serializator;
-import ru.lab.common.utils.User;
+import ru.lab.common.mainObjects.MusicBandCollection;
+import ru.lab.common.utils.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * КЛАСС, ЧИТАЮЩИЙ И ФИЛЬТРУЮЩИЙ КОМАНДЫ
  */
 public class CommandReader {
     public static final int MAX_SIZE = 32 * 1024;
-    public static final int PORT = 8989;
+    public static final int PORT = 8080;
 
     private CommandExecutor executor;
     private CommandValidator validator;
@@ -46,14 +45,14 @@ public class CommandReader {
             while (true) {
                 try {
                     String line = reader.readLine();
-                    if (line == null) break;
+                    if (line == null) return;
 
                     AbstractMap.SimpleEntry<Command, String> commandEntry = parseCommand(line);
                     Command command = commandEntry.getKey();
                     String commandArgs = commandEntry.getValue();
 
                     request = validateCommand(command, commandArgs);
-                    sendRequest(request);
+                    if (request != null) sendRequest(request);
                 } catch (InvalidExecuteCommand e) {
                     System.out.println("Команда неверна");
                 } catch (IOException | InterruptedException e) {
@@ -120,9 +119,6 @@ public class CommandReader {
             case EXIT:
                 validator.exit();
                 break;
-            case INSERT_AT:
-                request = validator.insertAtIndex(commandArgs, client.getUser());
-                break;
             case SHUFFLE:
                 request = validator.shuffle(client.getUser());
                 break;
@@ -146,65 +142,72 @@ public class CommandReader {
     }
 
     /**
-     * ИСПОЛЬНЯЕТ КОМНДЫ
+     * ИСПОЛНЯЕТ КОМНДЫ
      *
      * @param command     ТИП КОМАНДОЧКИ
      * @param commandArgs ВОЗОЖНЫЙ АРГУМЕТ КОМАНДОЧКИ
      */
-    public Response executeCommand(Command command, Object commandArgs) {
+    public Response executeCommand(Command command, Object commandArgs, User user) {
         Response response = null;
-        switch (command) {
-            case REG:
-                response = executor.reg((User) commandArgs);
-                break;
-            case LOG:
-                response = executor.log((User) commandArgs);
-                break;
+        ReentrantLock lock = executor.getLock();
+        lock.lock();
+        try {
+            switch (command) {
+                case REG:
+                    response = executor.reg((User) commandArgs);
+                    break;
+                case LOG:
+                    response = executor.log((User) commandArgs);
+                    break;
 
 
-            case HELP:
-                response = executor.help();
-                break;
-            case INFO:
-                response = executor.info();
-                break;
-            case SHOW:
-                response = executor.show();
-                break;
-            case ADD:
-                response = executor.add((MusicBand) commandArgs);
-                break;
-            case UPDATE_ID:
-                response = executor.updateId((AbstractMap.SimpleEntry<Long, MusicBand>) commandArgs);
-                break;
-            case REMOVE_BY_ID:
-                response = executor.removeId((long) commandArgs);
-                break;
-            case CLEAR:
-                response = executor.clear();
-                break;
-            case INSERT_AT:
-                response = executor.insertAtIndex((AbstractMap.SimpleEntry<Integer, MusicBand>) commandArgs);
-                break;
-            case SHUFFLE:
-                response = executor.shuffle();
-                break;
-            case SORT:
-                response = executor.sort();
-                break;
-            case REORDER:
-                response = executor.reorder();
-                break;
-            case SHOW_BY_ALBUM:
-                response = executor.showByBestAlbum((String) commandArgs);
-                break;
-            case SHOW_GREATER_THAN_ALBUM:
-                response = executor.showGreaterThanAlbum((Album) commandArgs);
-                break;
-            case SHOW_NUM_OF_PARTICIPANTS:
-                response = executor.showNumberOfParticipants();
-                break;
+                case HELP:
+                    response = executor.help();
+                    break;
+                case INFO:
+                    response = executor.info();
+                    break;
+                case SHOW:
+                    response = executor.show();
+                    break;
+                case ADD:
+                    response = executor.add((MusicBand) commandArgs, user);
+                    break;
+                case UPDATE_ID:
+                    response = executor.updateId((AbstractMap.SimpleEntry<Integer, MusicBand>) commandArgs, user);
+                    break;
+                case REMOVE_BY_ID:
+                    response = executor.removeId((int) commandArgs, user);
+                    break;
+                case CLEAR:
+                    response = executor.clear(user);
+                    break;
+                case EXECUTE:
+                    response = new Response("", "Скрипт был выполнен", Mark.STRING);
+                    break;
+                case SHUFFLE:
+                    response = executor.shuffle();
+                    break;
+                case SORT:
+                    response = executor.sort();
+                    break;
+                case REORDER:
+                    response = executor.reorder();
+                    break;
+                case SHOW_BY_ALBUM:
+                    response = executor.showByBestAlbum((String) commandArgs);
+                    break;
+                case SHOW_GREATER_THAN_ALBUM:
+                    response = executor.showGreaterThanAlbum((Album) commandArgs);
+                    break;
+                case SHOW_NUM_OF_PARTICIPANTS:
+                    response = executor.showNumberOfParticipants();
+                    break;
+            }
+        } finally {
+            lock.unlock();
         }
+
         return response;
     }
 
