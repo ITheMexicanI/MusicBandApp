@@ -2,7 +2,7 @@
   <artifact type="jar" name="Client">
     <output-path>$PROJECT_DIR$/out/artifacts/Client</output-path>
     <root id="archive" name="Lab.jar">
-      <element id="module-output" name="Lab" />
+      <element id="module-output" name="MusicBandApp" />
     </root>
   </artifact>
 </component>
