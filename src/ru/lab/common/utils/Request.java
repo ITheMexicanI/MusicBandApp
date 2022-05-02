@@ -32,6 +32,7 @@ public class Request implements Serializable {
         return "Request {" +
                 "command: '" + command +
                 "', argument: '" + argument +
+                "', user: '" + user +
                 "'}";
     }
 }

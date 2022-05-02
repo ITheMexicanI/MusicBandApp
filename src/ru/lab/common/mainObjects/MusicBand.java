@@ -11,13 +11,13 @@ import java.util.Objects;
  */
 public class MusicBand implements Comparable<MusicBand>, Serializable {
     private long id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
-    private String name; //Поле не может быть null, Строка не может быть пустой
-    private Coordinates coordinates; //Поле не может быть null
+    private final String name; //Поле не может быть null, Строка не может быть пустой
+    private final Coordinates coordinates; //Поле не может быть null
     private java.util.Date creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
-    private long numberOfParticipants; //Значение поля должно быть больше 0
-    private java.time.LocalDate establishmentDate; //Поле не может быть null
-    private MusicGenre genre; //Поле может быть null
-    private Album bestAlbum; //Поле не может быть null
+    private final long numberOfParticipants; //Значение поля должно быть больше 0
+    private final java.time.LocalDate establishmentDate; //Поле не может быть null
+    private final MusicGenre genre; //Поле может быть null
+    private final Album bestAlbum; //Поле не может быть null
 
     /**
      * @param id - АЙДИ МУЗЫЧКИ
@@ -38,19 +38,6 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
         this.establishmentDate = establishmentDate;
         this.genre = genre;
         this.bestAlbum = bestAlbum;
-    }
-
-    /**
-     * ОБНОВЛЯЕТ ПОЛНОСТЬЮ МУЗЫЧКУ
-     * @param o ДРУГАЯ МУЗЫЧКА
-     */
-    public void updateElement(MusicBand o) {
-        this.name = o.getName();
-        this.coordinates = o.getCoordinates();
-        this.numberOfParticipants = o.getNumberOfParticipants();
-        this.establishmentDate = o.getEstablishmentDate();
-        this.genre = o.getGenre();
-        this.bestAlbum = o.getBestAlbum();
     }
 
     /**
@@ -137,21 +124,6 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
                 ", дата создания группы: " + establishmentDate.toString() +
                 ", жанр: " + genre.toString() +
                 ", " + bestAlbum;
-    }
-
-    /**
-     * @return ВОЗВРАЩАЕТ СТРОКУ ВИДА CSV ФАЙЛА
-     */
-    public String getCSVString() {
-        return  id + "," +
-                name + "," +
-                coordinates.getX() + "," +
-                coordinates.getY() + "," +
-                new SimpleDateFormat("dd-MM-yyyy").format(creationDate) + "," +
-                numberOfParticipants + "," +
-                establishmentDate.toString() + "," +
-                genre.toString() + "," +
-                bestAlbum.getName() + "," + bestAlbum.getTracks();
     }
 
     @Override

@@ -7,8 +7,7 @@ import java.util.*;
  * КЛАСС, ХРАНЯЩИЙ И УПРАВЛЯЮЩИЙ МУЗЫЧКОЙ
  */
 public class MusicBandCollection {
-    private Stack<MusicBand> musicBandStack = new Stack<>();
-    private final List<Long> ids = new ArrayList<>();
+    private final Stack<MusicBand> musicBandStack = new Stack<>();
     private final java.time.LocalDate initializingDate;
 
     /**
@@ -26,17 +25,12 @@ public class MusicBandCollection {
         return musicBandStack.size();
     }
 
-    public List<Long> getIds() {
-        return ids;
-    }
-
     /**
      * ДОБАВЛЯЕТ МУЗЫЧКУ В СТЭК С МУЗЫЧОЙ
      * @param musicBand САМА МУЗЫЧКА
      */
     public void addMusicBand(MusicBand musicBand) {
         musicBandStack.add(musicBand);
-        ids.add(musicBand.getId());
     }
 
 
@@ -56,37 +50,12 @@ public class MusicBandCollection {
         return musicBandStack;
     }
 
-    /**
-     * УДАЛЯЕТ ВСЮ МУЗЫЧКУ
-     */
-    public void clearCollection() {
-        musicBandStack = new Stack<>();
-    }
-
-
-    /**
-     * УДАЛЯЕТ МУЗЫЧКУ ПО ДАННОМУ ID
-     * @param id ID ЭЛЕМЕНТА
-     */
-    public void removeById(long id) {
-        int size = getCollection().size();
-        musicBandStack.removeIf(element -> element.getId() == id);
-        if (size > getCollection().size()) getIds().remove(id);
-    }
 
     /**
      * ПЕРЕМЕШИВАЕТ МУЗЫЧКУ
      */
     public void shuffle() {
         Collections.shuffle(musicBandStack);
-    }
-
-    /**
-     * @param element - МУЗЫЧКА
-     * @param position - ПОЗИЦИЯ НА КОТОРУЮ ПЫТАЕМСЯ ДОБАВИТЬ МУЗЫЧКУ
-     */
-    public void insertElement(MusicBand element, int position) {
-        musicBandStack.insertElementAt(element, position);
     }
 
     /**
@@ -100,22 +69,16 @@ public class MusicBandCollection {
         return null;
     }
 
-    public long getMinId() {
-        Collections.sort(getIds());
-        return getIds().get(0);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MusicBandCollection that = (MusicBandCollection) o;
         return musicBandStack.equals(((MusicBandCollection) o).getCollection());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(musicBandStack, ids, initializingDate);
+        return Objects.hash(musicBandStack, initializingDate);
     }
 }
 

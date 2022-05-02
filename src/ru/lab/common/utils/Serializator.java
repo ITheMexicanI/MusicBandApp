@@ -1,23 +1,25 @@
 package ru.lab.common.utils;
 
-import ru.lab.common.commands.CommandReader;
-
 import java.io.*;
 
 public class Serializator {
+    public static final int MAX_SIZE = 32 * 1024;
+    public static final int PORT = 8181;
+
     public static ByteArrayOutputStream serialize(Object request) {
         ObjectOutputStream oos;
-        ByteArrayOutputStream bos;
+        ByteArrayOutputStream bos = null;
         try {
-            bos = new ByteArrayOutputStream(CommandReader.MAX_SIZE);
+            bos = new ByteArrayOutputStream(MAX_SIZE);
             oos = new ObjectOutputStream(bos);
             oos.writeObject(request);
             oos.close();
             return bos;
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
+
+        return bos;
     }
 
     public static Object deserialize(byte[] request) {
