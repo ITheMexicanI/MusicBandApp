@@ -166,8 +166,10 @@ public class DataBaseHelper {
         try {
             connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
             statement = connection.createStatement();
+
         } catch (SQLException e) {
-            Server.logger.info("Database connection error");
+            Server.logger.info("Database connection error, exit...");
+            System.exit(-1);
         }
     }
 }

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.DatagramChannel;
 
-public class Client {
+public class    Client {
     public static void main(String[] args) {
         try {
             // Connect to channel
