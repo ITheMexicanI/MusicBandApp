@@ -9,9 +9,7 @@ import ru.lab.common.utils.Response;
 import ru.lab.common.utils.User;
 
 import java.sql.SQLException;
-import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -173,7 +171,7 @@ public class CommandExecutor {
             Server.logger.info("Database work error");
             e.printStackTrace();
         }
-        return new Response("Элемента с таким id нет или элемент вам не принадлежит.", "Возрат в главное меню...", Mark.STRING);
+        return new Response("Элемента с таким id нет или элемент вам не принадлежит.", "Возврат в главное меню...", Mark.STRING);
     }
 
     private Response clear(User user) {
@@ -191,7 +189,7 @@ public class CommandExecutor {
 
     private Response shuffle() {
         collection.shuffle();
-        return new Response("Коллекция перемешана", "Возрат в главное меню...", Mark.STRING);
+        return new Response("Коллекция перемешана", "Возврат в главное меню...", Mark.STRING);
     }
 
     private Response sort() {
@@ -209,7 +207,8 @@ public class CommandExecutor {
     }
 
     private Response showGreaterThanAlbum(Album album) {
-        return new Response("Результат:", collection.getCollection().stream().filter(element -> element.getBestAlbum().compareTo(album) > 0).collect(Collectors.toList()), Mark.LIST);
+        List<MusicBand> list = collection.getCollection().stream().filter(element -> element.getBestAlbum().compareTo(album) > 0).collect(Collectors.toList());
+        return new Response("Результат:", list, Mark.LIST);
     }
 
     private Response showNumberOfParticipants() {

@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 public class Server {
     public static final Logger logger = Logger.getLogger(Server.class.getSimpleName());
 
-    private DatagramSocket socket = new DatagramSocket(Serializator.PORT);
+    private final DatagramSocket socket = new DatagramSocket(Serializator.PORT);
 
     private DataBaseHelper database;
     private MusicBandCollection collection;
@@ -25,28 +25,25 @@ public class Server {
             Server server = new Server();
             server.start();
         } catch (SocketException e) {
-            logger.info("Socket error/Port is busy");
+            logger.info("Socket error");
             e.printStackTrace();
         }
     }
 
     private void start() throws SocketException {
-        try {
-            initializeDataBase();
-            RequestProcessor requestProcessor = new RequestProcessor(socket, collection, database);
-            requestProcessor.run();
-        } catch (Exception e) {
-            logger.info("The server cannot be started, the port is busy");
-        }
+        initializeDataBase();
+        RequestProcessor requestProcessor = new RequestProcessor(socket, collection, database);
+        requestProcessor.run();
+
     }
+
 
     private void initializeDataBase() {
         try {
             database = new DataBaseHelper();
             collection = database.load();
         } catch (SQLException e) {
-            logger.info("DataBase initializing error, exit...");
-            System.exit(-1);
+            logger.info("DataBase initializing error");
         }
     }
 }

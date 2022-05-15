@@ -176,7 +176,7 @@ public class CommandValidator {
      * @param commandArgs ПУТЬ ДО СКРИПТА
      * @param user
      */
-    protected Request executeScript(String commandArgs, DatagramChannel channel, SocketAddress serverAddress, User user) { // TODO: не робит но робит
+    protected Request executeScript(String commandArgs, DatagramChannel channel, SocketAddress serverAddress, User user) {
         File file = new File(commandArgs);
 
         if (commandArgs.isEmpty()) {
@@ -250,7 +250,7 @@ public class CommandValidator {
     protected Request showGreaterThanAlbum(User user) {
         System.out.println("Введите название альбома, по которому будет произведен фильтр:");
         String albumName = inputNonNullString();
-        System.out.println("Введите количество треков в албоме");
+        System.out.println("Введите количество треков в альбоме");
         int tracks = (int) inputPositiveLong();
         Album album = new Album(albumName, tracks);
         System.out.println("Результат:");
@@ -365,7 +365,7 @@ public class CommandValidator {
         Coordinates coordinates = new Coordinates(corX, corY);
 
         // number of participants
-        System.out.println("Введите колчество участников:");
+        System.out.println("Введите количество участников:");
         long numberOfParticipants = inputPositiveLong();
 
         // date
