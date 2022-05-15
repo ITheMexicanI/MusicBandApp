@@ -1,5 +1,6 @@
 package ru.lab.server;
 
+import org.postgresql.util.PSQLException;
 import ru.lab.common.mainObjects.*;
 import ru.lab.common.utils.User;
 
@@ -9,22 +10,22 @@ import java.time.LocalDate;
 import java.util.Date;
 
 public class DataBaseHelper {
-    private static final String DB_USERNAME = "postgres";
-    private static final String DB_PASSWORD = "11435211";
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/lab";
+    private static final String DB_USERNAME = "s336072";
+    private static final String DB_PASSWORD = "onr015";
+    private static final String DB_URL = "jdbc:postgresql://pg/studs";
 
 
-    private Connection connection;
+    private final Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);;
     private PreparedStatement prepareStatement;
     private Statement statement;
 
-    public DataBaseHelper() {
+    public DataBaseHelper() throws SQLException {
         initializeConnection();
     }
 
     public boolean checkUser(User user) {
         try {
-            String request = "SELECT * FROM users WHERE login='" + user.getLogin() + "' AND password='" + user.getPassword() + "'";
+            String request = "SELECT * FROM users WHERE login='" + user.getLogin() + "' AND password='" + user.getPassword() + "';";
             ResultSet result = statement.executeQuery(request); // Объект, хранящий ответ от БД
 
             // Проверка на найденных пользователей
@@ -52,8 +53,8 @@ public class DataBaseHelper {
     }
 
     public void addUser(User user) throws SQLException {
-        prepareStatement = connection.prepareStatement("INSERT INTO users (?, ?)" +
-                                                            "VALUES (?, ?)");
+        prepareStatement = connection.prepareStatement("INSERT INTO users (login, password)" +
+                                                            "VALUES (?, ?);");
 
         prepareStatement.setString(1, user.getLogin());
         prepareStatement.setString(2, user.getPassword());
@@ -63,7 +64,7 @@ public class DataBaseHelper {
 
     public void add(MusicBand musicBand, int id, User user) throws SQLException {
         prepareStatement = connection.prepareStatement("INSERT INTO music (id, name, corX, corY, creationDate, numOfParticipants, estabDate, genre, albumName, albumTracks, login)" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
 
         prepareStatement.setInt(1, id);
         prepareStatement.setString(2, musicBand.getName());
@@ -83,7 +84,7 @@ public class DataBaseHelper {
     public MusicBandCollection load() throws SQLException {
         MusicBandCollection collection = new MusicBandCollection();
 
-        String request = "SELECT * FROM music";
+        String request = "SELECT * FROM music;";
         ResultSet result = statement.executeQuery(request);
 
         while (result.next()) {
@@ -109,7 +110,9 @@ public class DataBaseHelper {
             Coordinates coordinates = new Coordinates(corX, corY);
             Album album = new Album(albumName, albumTracks);
 
-            MusicBand musicBand = new MusicBand(id, name, coordinates, creationDate, numOfParticipants, estabDate, genre, album);
+            String user = result.getString("login");
+
+            MusicBand musicBand = new MusicBand(id, name, coordinates, creationDate, numOfParticipants, estabDate, genre, album, user);
             collection.addMusicBand(musicBand);
         }
 
@@ -117,7 +120,7 @@ public class DataBaseHelper {
     }
 
     public int getIdSeq() throws SQLException {
-        String request = "SELECT nextval('idSequence')";
+        String request = "SELECT nextval('idSequence');";
         ResultSet result = statement.executeQuery(request);
         result.next();
 
@@ -131,7 +134,7 @@ public class DataBaseHelper {
     }
 
     public MusicBandCollection removeById(int id, User user) throws SQLException {
-        prepareStatement = connection.prepareStatement("DELETE FROM music WHERE (id = ?) AND (login = ?)");
+        prepareStatement = connection.prepareStatement("DELETE FROM music WHERE (id = ?) AND (login = ?);");
         prepareStatement.setInt(1, id);
         prepareStatement.setString(2, user.getLogin());
 
@@ -164,10 +167,8 @@ public class DataBaseHelper {
 
     private void initializeConnection() {
         try {
-            connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
             statement = connection.createStatement();
-
-        } catch (SQLException e) {
+        } catch (Exception e) {
             Server.logger.info("Database connection error, exit...");
             System.exit(-1);
         }

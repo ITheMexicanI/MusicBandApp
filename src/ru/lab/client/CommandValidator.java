@@ -125,7 +125,7 @@ public class CommandValidator {
      */
     protected Request add(User user) {
         System.out.println("Добавление нового элемента в коллекцию:");
-        return new Request(Command.ADD, createMusicBand(), user);
+        return new Request(Command.ADD, createMusicBand(user.getLogin()), user);
     }
 
     /**
@@ -138,7 +138,7 @@ public class CommandValidator {
         try {
             int id = Integer.parseInt(commandArgs);
             System.out.println("Изменение элемента коллекции:");
-            return new Request(Command.UPDATE_ID, new AbstractMap.SimpleEntry<>(id, createMusicBand()), user);
+            return new Request(Command.UPDATE_ID, new AbstractMap.SimpleEntry<>(id, createMusicBand(user.getLogin())), user);
         } catch (NumberFormatException e) {
             System.out.println("Аргумент должен быть числом, возврат в главное меню...");
             return null;
@@ -352,7 +352,7 @@ public class CommandValidator {
      *
      * @return ВОЗВРАЩАЕТ НОВУЮ МУЗЫЧКУ
      */
-    private MusicBand createMusicBand() {
+    private MusicBand createMusicBand(String user) {
         // name of album
         System.out.println("Введите имя альбома");
         String name = inputNonNullString();
@@ -386,7 +386,7 @@ public class CommandValidator {
         int tracks = (int) inputPositiveLong();
         Album album = new Album(albumName, tracks);
 
-        return new MusicBand(-1, name, coordinates, new Date(), numberOfParticipants, date, genre, album);
+        return new MusicBand(-1, name, coordinates, new Date(), numberOfParticipants, date, genre, album, user);
     }
 
     public CommandInput getReader() {

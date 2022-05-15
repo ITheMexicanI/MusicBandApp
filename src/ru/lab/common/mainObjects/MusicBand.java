@@ -1,5 +1,7 @@
 package ru.lab.common.mainObjects;
 
+import ru.lab.common.utils.User;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -18,6 +20,7 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
     private final java.time.LocalDate establishmentDate; //Поле не может быть null
     private final MusicGenre genre; //Поле может быть null
     private final Album bestAlbum; //Поле не может быть null
+    private final String user;
 
     /**
      * @param id - АЙДИ МУЗЫЧКИ
@@ -29,7 +32,7 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
      * @param genre - ЖАНР МУЗЫЧКИ
      * @param bestAlbum - ЛУЧШИЙ АЛЬБОМ
      */
-    public MusicBand(long id, String name, Coordinates coordinates, java.util.Date creationDate, long numberOfParticipants, java.time.LocalDate establishmentDate, MusicGenre genre, Album bestAlbum) {
+    public MusicBand(long id, String name, Coordinates coordinates, java.util.Date creationDate, long numberOfParticipants, java.time.LocalDate establishmentDate, MusicGenre genre, Album bestAlbum, String user) {
         this.id = id;
         this.name = name;
         this.coordinates = coordinates;
@@ -38,6 +41,7 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
         this.establishmentDate = establishmentDate;
         this.genre = genre;
         this.bestAlbum = bestAlbum;
+        this.user = user;
     }
 
     /**
@@ -101,6 +105,10 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
         return creationDate;
     }
 
+    public String getUser() {
+        return user;
+    }
+
     /**
      * СРАВНИВАЕТ МУЗЫЧКИ ПО ИМЕНИ, СОРТИРОВКА ПО УМОЛЧАНИЮ
      * @param o - ДРУГАЯ МУЗЫЧКА
@@ -123,7 +131,8 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
                 ", участники: " + numberOfParticipants +
                 ", дата создания группы: " + establishmentDate.toString() +
                 ", жанр: " + genre.toString() +
-                ", " + bestAlbum;
+                ", " + bestAlbum +
+                ", принадлежит: " + user;
     }
 
     @Override
