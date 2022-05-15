@@ -51,7 +51,7 @@ public class DataBaseHelper {
     }
 
     public void addUser(User user) throws SQLException {
-        prepareStatement = connection.prepareStatement("INSERT INTO users (?, ?)" +
+        prepareStatement = connection.prepareStatement("INSERT INTO users (login, password)" +
                 "VALUES (?, ?)");
 
         prepareStatement.setString(1, user.getLogin());
@@ -97,6 +97,7 @@ public class DataBaseHelper {
                 creationDate = new SimpleDateFormat("dd-MM-yyyy").parse(result.getString("creationDate"));
                 estabDate = LocalDate.parse(result.getString("estabDate"));
             } catch (Exception e) {
+                e.printStackTrace();
                 Server.logger.info("Error when parsing creation dates");
             }
 
