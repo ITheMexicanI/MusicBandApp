@@ -39,7 +39,6 @@ public class RequestProcessor implements Runnable {
                 final byte[] clientRequestBuffer = new byte[Serializator.MAX_SIZE];
 
                 // Waiting a request
-                socket.setSoTimeout(0);
                 DatagramPacket packetFromClient = new DatagramPacket(clientRequestBuffer, clientRequestBuffer.length);
                 socket.receive(packetFromClient);
 
