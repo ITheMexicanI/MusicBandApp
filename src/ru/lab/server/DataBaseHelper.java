@@ -3,23 +3,19 @@ package ru.lab.server;
 import ru.lab.common.mainObjects.*;
 import ru.lab.common.utils.User;
 
+import java.io.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 
 public class DataBaseHelper {
-    private static final String DB_USERNAME = "postgres";
-    private static final String DB_PASSWORD = "11435211";
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/lab";
-
-
     private Connection connection;
     private PreparedStatement prepareStatement;
     private Statement statement;
 
-    public DataBaseHelper() {
-        initializeConnection();
+    public DataBaseHelper(String[] args) {
+        initializeConnection(args);
     }
 
     public boolean checkUser(User user) {
@@ -52,8 +48,8 @@ public class DataBaseHelper {
     }
 
     public void addUser(User user) throws SQLException {
-        prepareStatement = connection.prepareStatement("INSERT INTO users (?, ?)" +
-                                                            "VALUES (?, ?)");
+        prepareStatement = connection.prepareStatement("INSERT INTO users (login, password)" +
+                "VALUES (?, ?)");
 
         prepareStatement.setString(1, user.getLogin());
         prepareStatement.setString(2, user.getPassword());
@@ -162,13 +158,26 @@ public class DataBaseHelper {
         return load();
     }
 
-    private void initializeConnection() {
+    private void initializeConnection(String[] args) {
         try {
-            connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-            statement = connection.createStatement();
+            File file;
+            if (args.length > 0) file = new File(args[0]);
+            else file = new File("properties.txt");
 
+            FileReader fr = new FileReader(file);
+            BufferedReader reader = new BufferedReader(fr);
+
+            String dbUsername = reader.readLine();
+            String dbPassword = reader.readLine();
+            String dbUrl = reader.readLine();
+
+            connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+            statement = connection.createStatement();
+        } catch (IOException e) {
+            System.err.println("File with properties doesn't exists or the data fields are not correct\nAdd path to properties.txt in program arguments or place properties.txt near with the startup file");
+            System.exit(-1);
         } catch (SQLException e) {
-            Server.logger.info("Database connection error, exit...");
+            Server.logger.info("Database connection error, check file with properties, exit...");
             System.exit(-1);
         }
     }

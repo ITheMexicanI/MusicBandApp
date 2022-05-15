@@ -23,24 +23,24 @@ public class Server {
         try {
             logger.info("Server started");
             Server server = new Server();
-            server.start();
+            server.start(args);
         } catch (SocketException e) {
             logger.info("Socket error");
             e.printStackTrace();
         }
     }
 
-    private void start() throws SocketException {
-        initializeDataBase();
+    private void start(String[] args) throws SocketException {
+        initializeDataBase(args);
         RequestProcessor requestProcessor = new RequestProcessor(socket, collection, database);
         requestProcessor.run();
 
     }
 
 
-    private void initializeDataBase() {
+    private void initializeDataBase(String[] args) {
         try {
-            database = new DataBaseHelper();
+            database = new DataBaseHelper(args);
             collection = database.load();
         } catch (SQLException e) {
             logger.info("DataBase initializing error");

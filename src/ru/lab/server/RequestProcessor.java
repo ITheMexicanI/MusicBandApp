@@ -18,7 +18,7 @@ public class RequestProcessor implements Runnable {
     private final DataBaseHelper database;
     private final ExecutorService readPool = Executors.newCachedThreadPool();
 
-    private volatile List<NotConfirmedRequest> notConfirmingRequests = new ArrayList<>();
+    private final List<NotConfirmedRequest> notConfirmingRequests = new ArrayList<>();
 
     public RequestProcessor(DatagramSocket socket, MusicBandCollection collection, DataBaseHelper database) {
         this.socket = socket;
@@ -94,7 +94,7 @@ public class RequestProcessor implements Runnable {
         if (isAuthorized || command.equals(Command.HELP) || command.equals(Command.LOG) || command.equals(Command.REG)) {
             response = executor.executeCommand(command, argument, clientRequest.getUser());
         } else {
-            response = new Response("Вы не авторизованы, зарегестрируйтесь или войдите в аккаунт.", "Открыть справку: 'help'", Mark.STRING);
+            response = new Response("Вы не авторизованы, зарегистрируйтесь или войдите в аккаунт.", "Открыть справку: 'help'", Mark.STRING);
         }
         return response;
     }
@@ -120,7 +120,11 @@ public class RequestProcessor implements Runnable {
     }
 
     private boolean isContainsIdentificationString(String identificationString) {
-        return notConfirmingRequests.stream().anyMatch(request -> request.getIdentificationString().equals(identificationString));
+        try {
+            return notConfirmingRequests.stream().anyMatch(request -> request.getIdentificationString().equals(identificationString));
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 
     private void removeNotConfirmedRequestByString(String identificationString) {

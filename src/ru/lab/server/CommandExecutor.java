@@ -9,9 +9,7 @@ import ru.lab.common.utils.Response;
 import ru.lab.common.utils.User;
 
 import java.sql.SQLException;
-import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -103,22 +101,21 @@ public class CommandExecutor {
                 "'clear'                 : очистить коллекцию\n" +
                 "'execute PATH'          : считать и исполнить скрипт из указанного файла.(PATH - путь до файла-скрипта)\n" +
                 "'exit'                  : завершить программу (без сохранения в файл)\n" +
-                "'insert X'              : добавить новый элемент в заданную позицию (X - позиция)\n" +
-                "'shuffle'               : перемешать элaddементы коллекции в случайном порядке\n" +
+                "'shuffle'               : перемешать элементы коллекции в случайном порядке\n" +
                 "'reorder'               : отсортировать коллекцию в порядке\n" +
                 "'showByAlbum'           : вывести элементы, значение поля bestAlbum которых равно заданному\n" +
                 "'showGreaterThanAlbum'  : вывести элементы, значение поля bestAlbum которых больше заданного\n" +
                 "'showNumOfParticipants' : вывести значения поля numberOfParticipants всех элементов в порядке возрастания\n\n" +
-                "'reg'                   : выйти из аккаунта и зарегестрировать новый\n" +
+                "'reg'                   : выйти из аккаунта и зарегистрировать новый\n" +
                 "'log'                   : выйти из аккаунта и войти в другой" + "\n\n" +
                 "Возможные команды (Для неавторизованных пользователей): \n" +
                 "'help'                  : вывести справку по доступным командам\n" +
-                "'reg'                   : зарегестрировать новый аккаунт\n" +
+                "'reg'                   : зарегистрировать новый аккаунт\n" +
                 "'log'                   : войти в аккаунт", Mark.STRING);
     }
 
     private Response info() {
-        return new Response("Информация о коллекиции:", collection.getInfo(), Mark.STRING);
+        return new Response("Информация о коллекции:", collection.getInfo(), Mark.STRING);
     }
 
     private Response show() {
@@ -168,7 +165,7 @@ public class CommandExecutor {
             Server.logger.info("Database work error");
             e.printStackTrace();
         }
-        return new Response("Элемента с таким id нет или элемент вам не принадлежит.", "Возрат в главное меню...", Mark.STRING);
+        return new Response("Элемента с таким id нет или элемент вам не принадлежит.", "Возврат в главное меню...", Mark.STRING);
     }
 
     private Response clear(User user) {
@@ -180,22 +177,22 @@ public class CommandExecutor {
             e.printStackTrace();
         }
 
-        return new Response("Коллекция очищена от элементов, принадлежащих вам.", "Возрат в главное меню...", Mark.STRING);
+        return new Response("Коллекция очищена от элементов, принадлежащих вам.", "Возврат в главное меню...", Mark.STRING);
     }
 
     private Response shuffle() {
         collection.shuffle();
-        return new Response("Коллекция перемешана", "Возрат в главное меню...", Mark.STRING);
+        return new Response("Коллекция перемешана", "Возврат в главное меню...", Mark.STRING);
     }
 
     private Response sort() {
         Collections.sort(collection.getCollection());
-        return new Response("Коллекция остртирована по размеру объектов в ней", "Возрат в главное меню...", Mark.STRING);
+        return new Response("Коллекция отсортирована по размеру объектов в ней", "Возврат в главное меню...", Mark.STRING);
     }
 
     private Response reorder() {
         Collections.reverse(collection.getCollection());
-        return new Response("Обратная сортировка произведена", "Возрат в главное меню...", Mark.STRING);
+        return new Response("Обратная сортировка произведена", "Возврат в главное меню...", Mark.STRING);
     }
 
     private Response showByBestAlbum(String albumName) {
@@ -203,7 +200,8 @@ public class CommandExecutor {
     }
 
     private Response showGreaterThanAlbum(Album album) {
-        return new Response("Результат:", collection.getCollection().stream().filter(element -> element.getBestAlbum().compareTo(album) > 0).collect(Collectors.toList()), Mark.LIST);
+        List<MusicBand> list = collection.getCollection().stream().filter(element -> element.getBestAlbum().compareTo(album) > 0).collect(Collectors.toList());
+        return new Response("Результат:", list, Mark.LIST);
     }
 
     private Response showNumberOfParticipants() {
@@ -216,7 +214,7 @@ public class CommandExecutor {
 
             if (!isContains) {
                 database.addUser(user);
-                return new Response("Вы успешно зарегестрировались >.<", user, Mark.USER);
+                return new Response("Вы успешно зарегистрировались >.<", user, Mark.USER);
             }
         } catch (SQLException e) {
             e.printStackTrace();
